@@ -1,11 +1,11 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
-import {SetConfigParam} from "../layerzero-v2/protocol/interfaces/IMessageLibManager.sol";
-import {IMessageLib, MessageLibType} from "../layerzero-v2/protocol/interfaces/IMessageLib.sol";
-import {IReceiveUlnE2} from "../layerzero-v2/messagelib/uln/interfaces/IReceiveUlnE2.sol";
-import {Verification, VerificationState} from "../layerzero-v2/messagelib/uln/ReceiveUlnBase.sol";
+import {SetConfigParam} from "../../layerzero-v2/protocol/interfaces/IMessageLibManager.sol";
+import {IMessageLib, MessageLibType} from "../../layerzero-v2//protocol/interfaces/IMessageLib.sol";
+import {IReceiveUlnE2} from "../../layerzero-v2//messagelib/uln/interfaces/IReceiveUlnE2.sol";
+import {Verification} from "../../layerzero-v2/messagelib/uln/ReceiveUlnBase.sol";
 
 contract ReceiveLibMock is IReceiveUlnE2, IMessageLib {
     error NotImplemented();
@@ -29,13 +29,6 @@ contract ReceiveLibMock is IReceiveUlnE2, IMessageLib {
         returns (uint64 major, uint8 minor, uint8 endpointVersion)
     {
         return (3, 0, 2);
-    }
-
-    function verifiable(
-        bytes calldata,
-        bytes32
-    ) external pure returns (VerificationState) {
-        revert NotImplemented();
     }
 
     function commitVerification(bytes calldata, bytes32) external pure {

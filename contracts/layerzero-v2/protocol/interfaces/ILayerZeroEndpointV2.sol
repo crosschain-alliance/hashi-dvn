@@ -2,10 +2,10 @@
 
 pragma solidity >=0.8.0;
 
-import { IMessageLibManager } from "./IMessageLibManager.sol";
-import { IMessagingComposer } from "./IMessagingComposer.sol";
-import { IMessagingChannel } from "./IMessagingChannel.sol";
-import { IMessagingContext } from "./IMessagingContext.sol";
+import {IMessageLibManager} from "./IMessageLibManager.sol";
+import {IMessagingComposer} from "./IMessagingComposer.sol";
+import {IMessagingChannel} from "./IMessagingChannel.sol";
+import {IMessagingContext} from "./IMessagingContext.sol";
 
 struct MessagingParams {
     uint32 dstEid;
@@ -32,13 +32,12 @@ struct Origin {
     uint64 nonce;
 }
 
-enum ExecutionState {
-    NotExecutable,
-    Executable,
-    Executed
-}
-
-interface ILayerZeroEndpointV2 is IMessageLibManager, IMessagingComposer, IMessagingChannel, IMessagingContext {
+interface ILayerZeroEndpointV2 is
+    IMessageLibManager,
+    IMessagingComposer,
+    IMessagingChannel,
+    IMessagingContext
+{
     event PacketSent(bytes encodedPayload, bytes options, address sendLibrary);
 
     event PacketVerified(Origin origin, address receiver, bytes32 payloadHash);
@@ -59,23 +58,33 @@ interface ILayerZeroEndpointV2 is IMessageLibManager, IMessagingComposer, IMessa
 
     event LzTokenSet(address token);
 
-    function quote(MessagingParams calldata _params, address _sender) external view returns (MessagingFee memory);
+    event DelegateSet(address sender, address delegate);
+
+    function quote(
+        MessagingParams calldata _params,
+        address _sender
+    ) external view returns (MessagingFee memory);
 
     function send(
         MessagingParams calldata _params,
         address _refundAddress
     ) external payable returns (MessagingReceipt memory);
 
-    function verify(Origin calldata _origin, address _receiver, bytes32 _payloadHash) external;
+    function verify(
+        Origin calldata _origin,
+        address _receiver,
+        bytes32 _payloadHash
+    ) external;
 
     function verifiable(
         Origin calldata _origin,
-        address _receiver,
-        address _receiveLib,
-        bytes32 _payloadHash
+        address _receiver
     ) external view returns (bool);
 
-    function executable(Origin calldata _origin, address _receiver) external view returns (ExecutionState);
+    function initializable(
+        Origin calldata _origin,
+        address _receiver
+    ) external view returns (bool);
 
     function lzReceive(
         Origin calldata _origin,
@@ -86,7 +95,12 @@ interface ILayerZeroEndpointV2 is IMessageLibManager, IMessagingComposer, IMessa
     ) external payable;
 
     // oapp can burn messages partially by calling this function with its own business logic if messages are verified in order
-    function clear(address _oapp, Origin calldata _origin, bytes32 _guid, bytes calldata _message) external;
+    function clear(
+        address _oapp,
+        Origin calldata _origin,
+        bytes32 _guid,
+        bytes calldata _message
+    ) external;
 
     function setLzToken(address _lzToken) external;
 

@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: LZBL-1.2
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
-import { Packet } from "../../interfaces/ISendLib.sol";
-import { AddressCast } from "../../libs/AddressCast.sol";
+import {Packet} from "../../interfaces/ISendLib.sol";
+import {AddressCast} from "../../libs/AddressCast.sol";
 
 library PacketV1Codec {
     using AddressCast for address;
@@ -25,7 +25,9 @@ library PacketV1Codec {
     uint256 private constant GUID_OFFSET = 81; // keccak256(nonce + path)
     uint256 private constant MESSAGE_OFFSET = 113;
 
-    function encode(Packet memory _packet) internal pure returns (bytes memory encodedPacket) {
+    function encode(
+        Packet memory _packet
+    ) internal pure returns (bytes memory encodedPacket) {
         encodedPacket = abi.encodePacked(
             PACKET_VERSION,
             _packet.nonce,
@@ -38,7 +40,9 @@ library PacketV1Codec {
         );
     }
 
-    function encodePacketHeader(Packet memory _packet) internal pure returns (bytes memory) {
+    function encodePacketHeader(
+        Packet memory _packet
+    ) internal pure returns (bytes memory) {
         return
             abi.encodePacked(
                 PACKET_VERSION,
@@ -50,11 +54,15 @@ library PacketV1Codec {
             );
     }
 
-    function encodePayload(Packet memory _packet) internal pure returns (bytes memory) {
+    function encodePayload(
+        Packet memory _packet
+    ) internal pure returns (bytes memory) {
         return abi.encodePacked(_packet.guid, _packet.message);
     }
 
-    function header(bytes calldata _packet) internal pure returns (bytes calldata) {
+    function header(
+        bytes calldata _packet
+    ) internal pure returns (bytes calldata) {
         return _packet[0:GUID_OFFSET];
     }
 
@@ -74,7 +82,9 @@ library PacketV1Codec {
         return bytes32(_packet[SENDER_OFFSET:DST_EID_OFFSET]);
     }
 
-    function senderAddressB20(bytes calldata _packet) internal pure returns (address) {
+    function senderAddressB20(
+        bytes calldata _packet
+    ) internal pure returns (address) {
         return sender(_packet).toAddress();
     }
 
@@ -86,7 +96,9 @@ library PacketV1Codec {
         return bytes32(_packet[RECEIVER_OFFSET:GUID_OFFSET]);
     }
 
-    function receiverB20(bytes calldata _packet) internal pure returns (address) {
+    function receiverB20(
+        bytes calldata _packet
+    ) internal pure returns (address) {
         return receiver(_packet).toAddress();
     }
 
@@ -94,15 +106,21 @@ library PacketV1Codec {
         return bytes32(_packet[GUID_OFFSET:MESSAGE_OFFSET]);
     }
 
-    function message(bytes calldata _packet) internal pure returns (bytes calldata) {
+    function message(
+        bytes calldata _packet
+    ) internal pure returns (bytes calldata) {
         return bytes(_packet[MESSAGE_OFFSET:]);
     }
 
-    function payload(bytes calldata _packet) internal pure returns (bytes calldata) {
+    function payload(
+        bytes calldata _packet
+    ) internal pure returns (bytes calldata) {
         return bytes(_packet[GUID_OFFSET:]);
     }
 
-    function payloadHash(bytes calldata _packet) internal pure returns (bytes32) {
+    function payloadHash(
+        bytes calldata _packet
+    ) internal pure returns (bytes32) {
         return keccak256(payload(_packet));
     }
 }

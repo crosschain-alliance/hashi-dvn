@@ -2,8 +2,8 @@
 
 pragma solidity >=0.8.0;
 
-import { IWorker } from "../../interfaces/IWorker.sol";
-import { ILayerZeroDVN } from "./ILayerZeroDVN.sol";
+import {IWorker} from "../../interfaces/IWorker.sol";
+import {ILayerZeroDVN} from "./ILayerZeroDVN.sol";
 
 interface IDVN is IWorker, ILayerZeroDVN {
     struct DstConfigParam {
@@ -21,5 +21,7 @@ interface IDVN is IWorker, ILayerZeroDVN {
 
     event SetDstConfig(DstConfigParam[] params);
 
-    function dstConfig(uint32 _dstEid) external view returns (uint64, uint16, uint128);
+    function dstConfig(
+        uint32 _dstEid
+    ) external view returns (uint64, uint16, uint128);
 }

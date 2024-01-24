@@ -9,9 +9,9 @@ interface IWorker {
     event SetSupportedOptionTypes(uint32 dstEid, uint8[] optionTypes);
     event Withdraw(address lib, address to, uint256 amount);
 
-    error NotAllowed();
-    error OnlyMessageLib();
-    error RoleRenouncingDisabled();
+    error Worker_NotAllowed();
+    error Worker_OnlyMessageLib();
+    error Worker_RoleRenouncingDisabled();
 
     function setPriceFeed(address _priceFeed) external;
 
@@ -23,7 +23,12 @@ interface IWorker {
 
     function withdrawFee(address _lib, address _to, uint256 _amount) external;
 
-    function setSupportedOptionTypes(uint32 _eid, uint8[] calldata _optionTypes) external;
+    function setSupportedOptionTypes(
+        uint32 _eid,
+        uint8[] calldata _optionTypes
+    ) external;
 
-    function getSupportedOptionTypes(uint32 _eid) external view returns (uint8[] memory);
+    function getSupportedOptionTypes(
+        uint32 _eid
+    ) external view returns (uint8[] memory);
 }

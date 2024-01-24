@@ -5,10 +5,10 @@ require("dotenv").config();
 module.exports = {
   networks: {
     hardhat: {},
-    sepolia: {
-      url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_KEY}`,
-      accounts: [`0x${process.env.DEPLOYER_PRIV_KEY}`],
-    },
+    // sepolia: {
+    //   url: `https://eth-sepolia.g.alchemy.com/v2/${process.env.SEPOLIA_ALCHEMY_KEY}`,
+    //   accounts: [`0x${process.env.DEPLOYER_PRIV_KEY}`],
+    // },
   },
   solidity: "0.8.22",
 };

@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: LZBL-1.2
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
-import { Ownable } from "@openzeppelin/contracts/access/Ownable.sol";
+import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
 // the formal properties are documented in the setter functions
 struct UlnConfig {
@@ -31,15 +31,16 @@ abstract contract UlnBase is Ownable {
     // by limiting the total size, it would help constraint the design of DVNOptions
     uint8 private constant MAX_COUNT = (type(uint8).max - 1) / 2;
 
-    mapping(address oapp => mapping(uint32 eid => UlnConfig)) internal ulnConfigs;
+    mapping(address oapp => mapping(uint32 eid => UlnConfig))
+        internal ulnConfigs;
 
-    error Unsorted();
-    error InvalidRequiredDVNCount();
-    error InvalidOptionalDVNCount();
-    error AtLeastOneDVN();
-    error InvalidOptionalDVNThreshold();
-    error InvalidConfirmations();
-    error UnsupportedEid(uint32 eid);
+    error LZ_ULN_Unsorted();
+    error LZ_ULN_InvalidRequiredDVNCount();
+    error LZ_ULN_InvalidOptionalDVNCount();
+    error LZ_ULN_AtLeastOneDVN();
+    error LZ_ULN_InvalidOptionalDVNThreshold();
+    error LZ_ULN_InvalidConfirmations();
+    error LZ_ULN_UnsupportedEid(uint32 eid);
 
     event DefaultUlnConfigsSet(SetDefaultUlnConfigParam[] params);
     event UlnConfigSet(address oapp, uint32 eid, UlnConfig config);
@@ -52,14 +53,19 @@ abstract contract UlnBase is Ownable {
     /// 2) its configuration is more restrictive than the oapp ULN config that
     ///     a) it must not use NIL value, where NIL is used only by oapps to indicate the LITERAL 0
     ///     b) it must have at least one DVN
-    function setDefaultUlnConfigs(SetDefaultUlnConfigParam[] calldata _params) external onlyOwner {
+    function setDefaultUlnConfigs(
+        SetDefaultUlnConfigParam[] calldata _params
+    ) external onlyOwner {
         for (uint256 i = 0; i < _params.length; ++i) {
             SetDefaultUlnConfigParam calldata param = _params[i];
 
             // 2.a must not use NIL
-            if (param.config.requiredDVNCount == NIL_DVN_COUNT) revert InvalidRequiredDVNCount();
-            if (param.config.optionalDVNCount == NIL_DVN_COUNT) revert InvalidOptionalDVNCount();
-            if (param.config.confirmations == NIL_CONFIRMATIONS) revert InvalidConfirmations();
+            if (param.config.requiredDVNCount == NIL_DVN_COUNT)
+                revert LZ_ULN_InvalidRequiredDVNCount();
+            if (param.config.optionalDVNCount == NIL_DVN_COUNT)
+                revert LZ_ULN_InvalidOptionalDVNCount();
+            if (param.config.confirmations == NIL_CONFIRMATIONS)
+                revert LZ_ULN_InvalidConfirmations();
 
             // 2.b must have at least one dvn
             _assertAtLeastOneDVN(param.config);
@@ -71,8 +77,13 @@ abstract contract UlnBase is Ownable {
 
     // ============================ View ===================================
     // @dev assuming most oapps use default, we get default as memory and custom as storage to save gas
-    function getUlnConfig(address _oapp, uint32 _remoteEid) public view returns (UlnConfig memory rtnConfig) {
-        UlnConfig storage defaultConfig = ulnConfigs[DEFAULT_CONFIG][_remoteEid];
+    function getUlnConfig(
+        address _oapp,
+        uint32 _remoteEid
+    ) public view returns (UlnConfig memory rtnConfig) {
+        UlnConfig storage defaultConfig = ulnConfigs[DEFAULT_CONFIG][
+            _remoteEid
+        ];
         UlnConfig storage customConfig = ulnConfigs[_oapp][_remoteEid];
 
         // if confirmations is 0, use default
@@ -102,13 +113,15 @@ abstract contract UlnBase is Ownable {
                 // copy only if count > 0. save gas
                 rtnConfig.optionalDVNs = defaultConfig.optionalDVNs;
                 rtnConfig.optionalDVNCount = defaultConfig.optionalDVNCount;
-                rtnConfig.optionalDVNThreshold = defaultConfig.optionalDVNThreshold;
+                rtnConfig.optionalDVNThreshold = defaultConfig
+                    .optionalDVNThreshold;
             }
         } else {
             if (customConfig.optionalDVNCount != NIL_DVN_COUNT) {
                 rtnConfig.optionalDVNs = customConfig.optionalDVNs;
                 rtnConfig.optionalDVNCount = customConfig.optionalDVNCount;
-                rtnConfig.optionalDVNThreshold = customConfig.optionalDVNThreshold;
+                rtnConfig.optionalDVNThreshold = customConfig
+                    .optionalDVNThreshold;
             }
         }
 
@@ -118,12 +131,19 @@ abstract contract UlnBase is Ownable {
     }
 
     /// @dev Get the uln config without the default config for the given remoteEid.
-    function getAppUlnConfig(address _oapp, uint32 _remoteEid) external view returns (UlnConfig memory) {
+    function getAppUlnConfig(
+        address _oapp,
+        uint32 _remoteEid
+    ) external view returns (UlnConfig memory) {
         return ulnConfigs[_oapp][_remoteEid];
     }
 
     // ============================ Internal ===================================
-    function _setUlnConfig(uint32 _remoteEid, address _oapp, UlnConfig memory _param) internal {
+    function _setUlnConfig(
+        uint32 _remoteEid,
+        address _oapp,
+        UlnConfig memory _param
+    ) internal {
         _setConfig(_oapp, _remoteEid, _param);
 
         // get ULN config again as a catch all to ensure the config is valid
@@ -133,31 +153,47 @@ abstract contract UlnBase is Ownable {
 
     /// @dev a supported Eid must have a valid default uln config, which has at least one dvn
     function _isSupportedEid(uint32 _remoteEid) internal view returns (bool) {
-        UlnConfig storage defaultConfig = ulnConfigs[DEFAULT_CONFIG][_remoteEid];
-        return defaultConfig.requiredDVNCount > 0 || defaultConfig.optionalDVNThreshold > 0;
+        UlnConfig storage defaultConfig = ulnConfigs[DEFAULT_CONFIG][
+            _remoteEid
+        ];
+        return
+            defaultConfig.requiredDVNCount > 0 ||
+            defaultConfig.optionalDVNThreshold > 0;
     }
 
     function _assertSupportedEid(uint32 _remoteEid) internal view {
-        if (!_isSupportedEid(_remoteEid)) revert UnsupportedEid(_remoteEid);
+        if (!_isSupportedEid(_remoteEid))
+            revert LZ_ULN_UnsupportedEid(_remoteEid);
     }
 
     // ============================ Private ===================================
 
     function _assertAtLeastOneDVN(UlnConfig memory _config) private pure {
-        if (_config.requiredDVNCount == 0 && _config.optionalDVNThreshold == 0) revert AtLeastOneDVN();
+        if (_config.requiredDVNCount == 0 && _config.optionalDVNThreshold == 0)
+            revert LZ_ULN_AtLeastOneDVN();
     }
 
     /// @dev this private function is used in both setDefaultUlnConfigs and setUlnConfig
-    function _setConfig(address _oapp, uint32 _eid, UlnConfig memory _param) private {
+    function _setConfig(
+        address _oapp,
+        uint32 _eid,
+        UlnConfig memory _param
+    ) private {
         // @dev required dvns
         // if dvnCount == NONE, dvns list must be empty
         // if dvnCount == DEFAULT, dvn list must be empty
         // otherwise, dvnList.length == dvnCount and assert the list is valid
-        if (_param.requiredDVNCount == NIL_DVN_COUNT || _param.requiredDVNCount == DEFAULT) {
-            if (_param.requiredDVNs.length != 0) revert InvalidRequiredDVNCount();
+        if (
+            _param.requiredDVNCount == NIL_DVN_COUNT ||
+            _param.requiredDVNCount == DEFAULT
+        ) {
+            if (_param.requiredDVNs.length != 0)
+                revert LZ_ULN_InvalidRequiredDVNCount();
         } else {
-            if (_param.requiredDVNs.length != _param.requiredDVNCount || _param.requiredDVNCount > MAX_COUNT)
-                revert InvalidRequiredDVNCount();
+            if (
+                _param.requiredDVNs.length != _param.requiredDVNCount ||
+                _param.requiredDVNCount > MAX_COUNT
+            ) revert LZ_ULN_InvalidRequiredDVNCount();
             _assertNoDuplicates(_param.requiredDVNs);
         }
 
@@ -169,14 +205,23 @@ abstract contract UlnBase is Ownable {
         // example use case: an oapp uses the DEFAULT 'required' but
         //     a) use a custom 1/1 dvn (practically a required dvn), or
         //     b) use a custom 2/3 dvn
-        if (_param.optionalDVNCount == NIL_DVN_COUNT || _param.optionalDVNCount == DEFAULT) {
-            if (_param.optionalDVNs.length != 0) revert InvalidOptionalDVNCount();
-            if (_param.optionalDVNThreshold != 0) revert InvalidOptionalDVNThreshold();
+        if (
+            _param.optionalDVNCount == NIL_DVN_COUNT ||
+            _param.optionalDVNCount == DEFAULT
+        ) {
+            if (_param.optionalDVNs.length != 0)
+                revert LZ_ULN_InvalidOptionalDVNCount();
+            if (_param.optionalDVNThreshold != 0)
+                revert LZ_ULN_InvalidOptionalDVNThreshold();
         } else {
-            if (_param.optionalDVNs.length != _param.optionalDVNCount || _param.optionalDVNCount > MAX_COUNT)
-                revert InvalidOptionalDVNCount();
-            if (_param.optionalDVNThreshold == 0 || _param.optionalDVNThreshold > _param.optionalDVNCount)
-                revert InvalidOptionalDVNThreshold();
+            if (
+                _param.optionalDVNs.length != _param.optionalDVNCount ||
+                _param.optionalDVNCount > MAX_COUNT
+            ) revert LZ_ULN_InvalidOptionalDVNCount();
+            if (
+                _param.optionalDVNThreshold == 0 ||
+                _param.optionalDVNThreshold > _param.optionalDVNCount
+            ) revert LZ_ULN_InvalidOptionalDVNThreshold();
             _assertNoDuplicates(_param.optionalDVNs);
         }
         // don't assert valid count here, as it needs to be validated along side default config
@@ -188,7 +233,7 @@ abstract contract UlnBase is Ownable {
         address lastDVN = address(0);
         for (uint256 i = 0; i < _dvns.length; i++) {
             address dvn = _dvns[i];
-            if (dvn <= lastDVN) revert Unsorted(); // to ensure no duplicates
+            if (dvn <= lastDVN) revert LZ_ULN_Unsorted(); // to ensure no duplicates
             lastDVN = dvn;
         }
     }

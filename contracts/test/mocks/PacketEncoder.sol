@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
-import {Packet} from "../layerzero-v2/protocol/interfaces/ISendLib.sol";
+import {Packet} from "../../layerzero-v2/protocol/interfaces/ISendLib.sol";
 
 contract PacketEncoder {
     uint8 internal constant PACKET_VERSION = 1;

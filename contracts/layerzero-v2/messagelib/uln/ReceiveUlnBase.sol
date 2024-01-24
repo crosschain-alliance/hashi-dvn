@@ -1,16 +1,10 @@
 // SPDX-License-Identifier: LZBL-1.2
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
 import {PacketV1Codec} from "../../protocol/messagelib/libs/PacketV1Codec.sol";
 
 import {UlnBase, UlnConfig} from "./UlnBase.sol";
-
-enum VerificationState {
-    Verifying,
-    Verifiable,
-    Verified
-}
 
 struct Verification {
     bool submitted;
@@ -31,10 +25,26 @@ abstract contract ReceiveUlnBase is UlnBase {
         bytes32 proofHash
     );
 
-    error InvalidPacketHeader();
-    error InvalidPacketVersion();
-    error InvalidEid();
-    error Verifying();
+    error LZ_ULN_InvalidPacketHeader();
+    error LZ_ULN_InvalidPacketVersion();
+    error LZ_ULN_InvalidEid();
+    error LZ_ULN_Verifying();
+
+    // ============================ External ===================================
+    function verifiable(
+        UlnConfig memory _config,
+        bytes32 _headerHash,
+        bytes32 _payloadHash
+    ) external view returns (bool) {
+        return _checkVerifiable(_config, _headerHash, _payloadHash);
+    }
+
+    function assertHeader(
+        bytes calldata _packetHeader,
+        uint32 _localEid
+    ) external pure {
+        _assertHeader(_packetHeader, _localEid);
+    }
 
     // ============================ Internal ===================================
     /// @dev per DVN signing function
@@ -75,7 +85,7 @@ abstract contract ReceiveUlnBase is UlnBase {
         bytes32 _payloadHash
     ) internal {
         if (!_checkVerifiable(_config, _headerHash, _payloadHash)) {
-            revert Verifying();
+            revert LZ_ULN_Verifying();
         }
 
         // iterate the required DVNs
@@ -102,12 +112,12 @@ abstract contract ReceiveUlnBase is UlnBase {
         uint32 _localEid
     ) internal pure {
         // assert packet header is of right size 81
-        if (_packetHeader.length != 81) revert InvalidPacketHeader();
+        if (_packetHeader.length != 81) revert LZ_ULN_InvalidPacketHeader();
         // assert packet header version is the same as ULN
         if (_packetHeader.version() != PacketV1Codec.PACKET_VERSION)
-            revert InvalidPacketVersion();
+            revert LZ_ULN_InvalidPacketVersion();
         // assert the packet is for this endpoint
-        if (_packetHeader.dstEid() != _localEid) revert InvalidEid();
+        if (_packetHeader.dstEid() != _localEid) revert LZ_ULN_InvalidEid();
     }
 
     /// @dev for verifiable view function

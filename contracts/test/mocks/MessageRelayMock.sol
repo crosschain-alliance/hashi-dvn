@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
-import {IMessageRelay} from "../hashi/interfaces/IMessageRelay.sol";
+import {IMessageRelay} from "../../hashi/interfaces/IMessageRelay.sol";
 
 contract MessageRelayMock is IMessageRelay {
     event MessageRelayed(address indexed emitter, uint256 indexed messageId);

@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: UNLICENSED
 
-pragma solidity ^0.8.22;
+pragma solidity ^0.8.20;
 
-import {SetConfigParam} from "../layerzero-v2/protocol/interfaces/IMessageLibManager.sol";
-import {MessagingFee} from "../layerzero-v2/protocol/interfaces/ILayerZeroEndpointV2.sol";
-import {MessageLibType} from "../layerzero-v2/protocol/interfaces/IMessageLib.sol";
-import {ISendLib, Packet} from "../layerzero-v2/protocol/interfaces/ISendLib.sol";
-import {Transfer} from "../layerzero-v2/protocol/libs/Transfer.sol";
+import {SetConfigParam} from "../../layerzero-v2/protocol/interfaces/IMessageLibManager.sol";
+import {MessagingFee} from "../../layerzero-v2/protocol/interfaces/ILayerZeroEndpointV2.sol";
+import {MessageLibType} from "../../layerzero-v2/protocol/interfaces/IMessageLib.sol";
+import {ISendLib, Packet} from "../../layerzero-v2/protocol/interfaces/ISendLib.sol";
+import {Transfer} from "../../layerzero-v2/protocol/libs/Transfer.sol";
 
 contract SendLibMock is ISendLib {
     mapping(address worker => uint256) public fees;

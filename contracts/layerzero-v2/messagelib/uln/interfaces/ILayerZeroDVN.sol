@@ -18,7 +18,10 @@ interface ILayerZeroDVN {
     // @param _confirmations - block confirmation delay before relaying blocks
     // @param _sender - the source sending contract address
     // @param _options - options
-    function assignJob(AssignJobParam calldata _param, bytes calldata _options) external payable returns (uint256 fee);
+    function assignJob(
+        AssignJobParam calldata _param,
+        bytes calldata _options
+    ) external payable returns (uint256 fee);
 
     // @notice query the dvn fee for relaying block information to the destination chain
     // @param _dstEid the destination endpoint identifier
