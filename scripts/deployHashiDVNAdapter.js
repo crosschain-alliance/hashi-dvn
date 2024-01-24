@@ -16,7 +16,7 @@ async function main() {
 
   const hashiDVNAdapter = await hre.ethers.deployContract(
     "HashiDVNAdapter",
-    [sendLib, receiveLib, admins, yaho, hashi, hashiRegistry, owner],
+    [admins, yaho, hashi, hashiRegistry],
     deployer
   );
 

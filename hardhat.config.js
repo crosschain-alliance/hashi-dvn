@@ -10,5 +10,11 @@ module.exports = {
     //   accounts: [`0x${process.env.DEPLOYER_PRIV_KEY}`],
     // },
   },
-  solidity: "0.8.22",
+  solidity: {
+    version: "0.8.22",
+
+    settings: {
+      viaIR: true,
+    },
+  },
 };
