@@ -16,6 +16,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
     mapping(uint32 dstEid => DstConfig config) public dstConfig;
     mapping(uint32 dstEid => uint256 chainId) public eidToChainId;
 
+    error HashiMismatch();
     Yaho yaho;
     Hashi hashi;
     HashiRegistry hashiRegistry;
@@ -72,6 +73,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
 
         // In _param.packetHeader, there is no message field. In order to construct the message for Hashi, we need to encode payload with packet header
         // Hashi's message (bytes) = DVN's payload (bytes)
+        // receiverLib = _getAndAssertReceiveLib(sendLib, dstEid)
         bytes32 receiveLib = _getAndAssertReceiveLib(msg.sender, _param.dstEid);
         bytes memory message = _encode(
             receiveLib,
@@ -151,18 +153,15 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
             bytes memory packetHeader,
             bytes32 payloadHash
         ) = DVNAdapterMessageCodec.decode(message);
-
         (
             uint32 _srcEid,
             uint32 _dstEid,
             bytes32 _receiver
         ) = _decodePacketHeader(packetHeader);
-
         address[] memory destAdapters = hashiRegistry.getDestAdapters(
             _srcEid,
             _dstEid
         );
-
         bytes32 reportedHash = 0x0;
         IOracleAdapter[] memory oracleAdapters = new IOracleAdapter[](
             destAdapters.length
@@ -170,7 +169,6 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
         for (uint56 i = 0; i < destAdapters.length; i++) {
             oracleAdapters[i] = IOracleAdapter(destAdapters[i]);
         }
-
         uint256 sourceChainId = eidToChainId[_srcEid];
         try
             hashi.getHash(sourceChainId, uint256(messageId), oracleAdapters)
@@ -180,9 +178,10 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
         } catch Error(string memory error) {
             emit LogError(error);
         }
-
         if (reportedHash != 0x0) {
             _decodeAndVerify(message);
+        } else {
+            revert HashiMismatch();
         }
     }
 

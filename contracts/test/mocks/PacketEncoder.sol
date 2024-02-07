@@ -4,6 +4,16 @@ pragma solidity ^0.8.20;
 
 import {Packet} from "../../layerzero-v2/protocol/interfaces/ISendLib.sol";
 
+//struct Packet {
+//     uint64 nonce;
+//     uint32 srcEid;
+//     address sender;
+//     uint32 dstEid;
+//     bytes32 receiver;
+//     bytes32 guid;
+//     bytes message;
+// }
+
 contract PacketEncoder {
     uint8 internal constant PACKET_VERSION = 1;
 
