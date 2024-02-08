@@ -138,6 +138,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
         fee = IHashiDVNAdapterFeeLib(workerFeeLib).getFee(_dstEid);
     }
 
+
     /// @notice Function called by Hashi DVN on destination chain
     ///         1. Check if message hash from Hashi adapters are the same w.r.t. the same messageId
     ///         2. If same, call receiveLib to verify the payload w.r.t the messageId
@@ -147,7 +148,8 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
     function verifyMessageHash(
         bytes32 messageId,
         bytes calldata message
-    ) external onlyRole(ADMIN_ROLE) {
+    ) external onlyRole(ADMIN_ROLE)returns (uint256) {
+     
         (
             address receiveLib,
             bytes memory packetHeader,
@@ -166,6 +168,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
         IOracleAdapter[] memory oracleAdapters = new IOracleAdapter[](
             destAdapters.length
         );
+     
         for (uint56 i = 0; i < destAdapters.length; i++) {
             oracleAdapters[i] = IOracleAdapter(destAdapters[i]);
         }

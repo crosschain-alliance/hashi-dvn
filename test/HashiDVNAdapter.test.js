@@ -1,5 +1,3 @@
-// TODO: update test
-
 const { expect } = require("chai");
 
 const { ethers } = require("hardhat");
@@ -97,11 +95,6 @@ describe("Hashi DVN Adapter test", function () {
       await hashiRegistry.getAddress()
     );
 
-    // struct ReceiveLibParam {
-    //     address sendLib;
-    //     uint32 dstEid;
-    //     bytes32 receiveLib;
-    // }
     await hashiDVNAdapter.connect(admin).setReceiveLibs([
       {
         sendLib: await sendLibMock.getAddress(),
@@ -134,15 +127,40 @@ describe("Hashi DVN Adapter test", function () {
     };
     packetHeader = await packetEncoder.encodePacketHeader(packet);
     payloadHash = await packetEncoder.encodePayloadHash(packet);
-    //payload = hashiDVNAdapter.encodePayload(packetHeader, payloadHash);
+    payload = await packetEncoder.encode(
+      zeroPadHex(await receiveLibMock.getAddress(), 64),
+      packetHeader,
+      payloadHash
+    );
     assignJobParam = {
       dstEid,
       packetHeader,
-      payloadHash:
-        "0x0000000000000000000000000000000000000000000000000000000000000000",
+      payloadHash,
       confirmations: 0,
       sender: await alice.getAddress(),
     };
+  });
+
+  it("Should assign job correctly", async function () {
+    const sendLibAddr = await sendLibMock.getAddress();
+    console.log(sendLibAddr);
+    await impersonateAccount(sendLibAddr);
+    await setBalance(sendLibAddr, 100n ** 18n);
+    let sendLibMockSigner = await ethers.getSigner(sendLibAddr);
+
+    // first message Id
+    const messageId =
+      "0x0000000000000000000000000000000000000000000000000000000000000000";
+
+    expect(
+      await hashiDVNAdapter
+        .connect(sendLibMockSigner)
+        .assignJob(assignJobParam, "0x")
+    )
+      .to.emit(messageRelayA, "MessageRelayed")
+      .withArgs(sourceAdapters_[0], messageId)
+      .to.emit(messageRelayB, "MessageRelayed")
+      .withArgs(sourceAdapters_[1], messageId);
   });
 
   it("Should verify Message Hash correctly", async function () {
@@ -156,6 +174,7 @@ describe("Hashi DVN Adapter test", function () {
       .connect(sendLibMockSigner)
       .assignJob(assignJobParam, "0x");
 
+    // first message Id
     const messageId =
       "0x0000000000000000000000000000000000000000000000000000000000000000";
 
@@ -166,12 +185,30 @@ describe("Hashi DVN Adapter test", function () {
       await messageRelayAdapterB.storeHash(srcChainId, messageId, payloadHash)
     ).to.emit(messageRelayAdapterB, "HashStored");
 
-    // TODO:  TypeError: Cannot read properties of undefined (reading 'then')
-    // await expect(
-    //   await hashiDVNAdapter.connect(admin).verifyMessageHash(messageId, payload)
-    // )
-    //   .to.emit(hashiDVNAdapter, "HashFromAdaptersMatched")
-    //   .withArgs(messageId, payloadHash);
+    await expect(
+      await hashiDVNAdapter.connect(admin).verifyMessageHash(messageId, payload)
+    )
+      .to.emit(hashiDVNAdapter, "HashFromAdaptersMatched")
+      .withArgs(messageId, payloadHash);
+
+    // check if the hashLookup[headerHash=>payloadHash=>dvn] = Verification{submitted, confirmations} from receiveLib is called;
+    const verification = await receiveLibMock.hashLookup(
+      ethers.keccak256(packetHeader),
+      payloadHash,
+      await hashiDVNAdapter.getAddress()
+    );
+    expect(verification[0]).to.equal(true);
+  });
+
+  it("Should getFee correctly", async function () {
+    expect(
+      await hashiDVNAdapter.getFee(
+        dstEid,
+        0,
+        "0x0000000000000000000000000000000000000000",
+        "0x"
+      )
+    ).to.equal(1_000);
   });
 });
 
