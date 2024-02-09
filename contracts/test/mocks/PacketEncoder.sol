@@ -14,16 +14,20 @@ import {DVNAdapterMessageCodec} from "../../layerzero-v2/messagelib/uln/dvn/adap
 //     bytes message;
 // }
 
-contract PacketEncoder  {
+contract PacketEncoder {
     uint8 internal constant PACKET_VERSION = 1;
-
 
     function encode(
         bytes32 _receiveLib,
         bytes memory _packetHeader,
         bytes32 _payloadHash
-    )external pure returns(bytes memory payload){
-        return DVNAdapterMessageCodec.encode(_receiveLib,_packetHeader,_payloadHash);
+    ) external pure returns (bytes memory payload) {
+        return
+            DVNAdapterMessageCodec.encode(
+                _receiveLib,
+                _packetHeader,
+                _payloadHash
+            );
     }
 
     function encodePacketHeader(

@@ -33,12 +33,16 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.17;
 
-import { IOracleAdapter } from "./interfaces/IOracleAdapter.sol";
+import {IOracleAdapter} from "./interfaces/IOracleAdapter.sol";
 
 contract Hashi {
     error NoOracleAdaptersGiven(address emitter);
     error OracleDidNotReport(address emitter, IOracleAdapter oracleAdapter);
-    error OraclesDisagree(address emitter, IOracleAdapter oracleOne, IOracleAdapter oracleTwo);
+    error OraclesDisagree(
+        address emitter,
+        IOracleAdapter oracleOne,
+        IOracleAdapter oracleTwo
+    );
 
     /// @dev Returns the hash reported by a given oracle for a given ID.
     /// @param oracleAdapter Address of the oracle adapter to query.
@@ -63,7 +67,8 @@ contract Hashi {
         uint256 domain,
         uint256 id
     ) public view returns (bytes32[] memory) {
-        if (oracleAdapters.length == 0) revert NoOracleAdaptersGiven(address(this));
+        if (oracleAdapters.length == 0)
+            revert NoOracleAdaptersGiven(address(this));
         bytes32[] memory hashes = new bytes32[](oracleAdapters.length);
         for (uint256 i = 0; i < oracleAdapters.length; i++) {
             hashes[i] = getHashFromOracle(oracleAdapters[i], domain, id);
@@ -82,13 +87,25 @@ contract Hashi {
         uint256 id,
         IOracleAdapter[] memory oracleAdapters
     ) public view returns (bytes32 hash) {
-        if (oracleAdapters.length == 0) revert NoOracleAdaptersGiven(address(this));
-        bytes32[] memory hashes = getHashesFromOracles(oracleAdapters, domain, id);
+        if (oracleAdapters.length == 0)
+            revert NoOracleAdaptersGiven(address(this));
+        bytes32[] memory hashes = getHashesFromOracles(
+            oracleAdapters,
+            domain,
+            id
+        );
         hash = hashes[0];
-        if (hash == bytes32(0)) revert OracleDidNotReport(address(this), oracleAdapters[0]);
+        if (hash == bytes32(0))
+            revert OracleDidNotReport(address(this), oracleAdapters[0]);
         for (uint256 i = 1; i < hashes.length; i++) {
-            if (hashes[i] == bytes32(0)) revert OracleDidNotReport(address(this), oracleAdapters[i]);
-            if (hash != hashes[i]) revert OraclesDisagree(address(this), oracleAdapters[i - 1], oracleAdapters[i]);
+            if (hashes[i] == bytes32(0))
+                revert OracleDidNotReport(address(this), oracleAdapters[i]);
+            if (hash != hashes[i])
+                revert OraclesDisagree(
+                    address(this),
+                    oracleAdapters[i - 1],
+                    oracleAdapters[i]
+                );
         }
     }
 }

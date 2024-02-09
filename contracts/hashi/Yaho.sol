@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.17;
 
-import { IMessageRelay } from "./interfaces/IMessageRelay.sol";
-import { Message } from "./interfaces/IMessageDispatcher.sol";
-import { IYaho } from "./interfaces/IYaho.sol";
-import { MessageHashCalculator } from "./utils/MessageHashCalculator.sol";
+import {IMessageRelay} from "./interfaces/IMessageRelay.sol";
+import {Message} from "./interfaces/IMessageDispatcher.sol";
+import {IYaho} from "./interfaces/IYaho.sol";
+import {MessageHashCalculator} from "./utils/MessageHashCalculator.sol";
 
 contract Yaho is IYaho, MessageHashCalculator {
     mapping(uint256 => bytes32) public hashes;
@@ -13,14 +13,28 @@ contract Yaho is IYaho, MessageHashCalculator {
     /// @dev Dispatches a batch of messages, putting their into storage and emitting their contents as an event.
     /// @param messages An array of Messages to be dispatched.
     /// @return messageIds An array of message IDs corresponding to the dispatched messages.
-    function dispatchMessages(Message[] memory messages) public payable returns (bytes32[] memory) {
+    function dispatchMessages(
+        Message[] memory messages
+    ) public payable returns (bytes32[] memory) {
         if (messages.length == 0) revert NoMessagesGiven(address(this));
         bytes32[] memory messageIds = new bytes32[](messages.length);
         for (uint256 i = 0; i < messages.length; i++) {
             uint256 id = count;
-            hashes[id] = calculateHash(block.chainid, id, address(this), msg.sender, messages[i]);
+            hashes[id] = calculateHash(
+                block.chainid,
+                id,
+                address(this),
+                msg.sender,
+                messages[i]
+            );
             messageIds[i] = bytes32(id);
-            emit MessageDispatched(bytes32(id), msg.sender, messages[i].toChainId, messages[i].to, messages[i].data);
+            emit MessageDispatched(
+                bytes32(id),
+                msg.sender,
+                messages[i].toChainId,
+                messages[i].to,
+                messages[i].data
+            );
             count++;
         }
         return messageIds;
@@ -38,10 +52,14 @@ contract Yaho is IYaho, MessageHashCalculator {
     ) external payable returns (bytes32[] memory) {
         if (messageIds.length == 0) revert NoMessageIdsGiven(address(this));
         if (adapters.length == 0) revert NoAdaptersGiven(address(this));
-        if (adapters.length != destinationAdapters.length) revert UnequalArrayLengths(address(this));
+        if (adapters.length != destinationAdapters.length)
+            revert UnequalArrayLengths(address(this));
         bytes32[] memory adapterReciepts = new bytes32[](adapters.length);
         for (uint256 i = 0; i < adapters.length; i++) {
-            adapterReciepts[i] = IMessageRelay(adapters[i]).relayMessages(messageIds, destinationAdapters[i]);
+            adapterReciepts[i] = IMessageRelay(adapters[i]).relayMessages(
+                messageIds,
+                destinationAdapters[i]
+            );
         }
         return adapterReciepts;
     }
@@ -65,7 +83,10 @@ contract Yaho is IYaho, MessageHashCalculator {
         }
         bytes32[] memory adapterReciepts = new bytes32[](adapters.length);
         for (uint256 i = 0; i < adapters.length; i++) {
-            adapterReciepts[i] = IMessageRelay(adapters[i]).relayMessages(uintIds, destinationAdapters[i]);
+            adapterReciepts[i] = IMessageRelay(adapters[i]).relayMessages(
+                uintIds,
+                destinationAdapters[i]
+            );
         }
         return (messageIds, adapterReciepts);
     }

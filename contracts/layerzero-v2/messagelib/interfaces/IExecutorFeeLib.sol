@@ -2,7 +2,7 @@
 
 pragma solidity >=0.8.0;
 
-import { IExecutor } from "./IExecutor.sol";
+import {IExecutor} from "./IExecutor.sol";
 
 interface IExecutorFeeLib {
     struct FeeParams {

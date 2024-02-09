@@ -5,6 +5,10 @@ pragma solidity ^0.8.20;
 import {HashiRegistry} from "./HashiRegistry.sol";
 import {IHashiDVNAdapterFeeLib} from "./interfaces/IHashiDVNAdapterFeeLib.sol";
 
+/// @title HashiDVNAdapterFeeLib get fee from HashiRegistry
+/// @author zeng
+/// @notice Hashi don't support dynamic fee query, fee for specific path is stored in fee variable
+/// @dev call getDestFee from HashiRegistry
 contract HashiDVNAdapterFeeLib is IHashiDVNAdapterFeeLib {
     address private _hashiRegistry;
 

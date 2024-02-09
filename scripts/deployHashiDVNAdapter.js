@@ -17,7 +17,7 @@ async function main() {
   const hashiDVNAdapter = await hre.ethers.deployContract(
     "HashiDVNAdapter",
     [admins, yaho, hashi, hashiRegistry],
-    deployer
+    deployer,
   );
 
   await hashiDVNAdapter.waitForDeployment();
@@ -25,7 +25,7 @@ async function main() {
   console.log(
     `Hashi DVN Adapter deployed to ${await hashiRegistry.getAddress()} on  ${
       hre.network.name
-    }`
+    }`,
   );
 }
 

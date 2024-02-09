@@ -1,5 +1,4 @@
 const { expect } = require("chai");
-
 const { ethers } = require("hardhat");
 const {
   impersonateAccount,
@@ -40,26 +39,29 @@ describe("Hashi DVN Adapter test", function () {
   const srcChainId = 11155111;
   const dstEid = 40109; // Mumbai
   const dstChainId = 80001;
+
   beforeEach(async function () {
     [admin, alice, bob] = await ethers.getSigners();
 
     const HashiFactory = await ethers.getContractFactory("Hashi");
     hashi = await HashiFactory.deploy();
+
     const YahoFactory = await ethers.getContractFactory("Yaho");
     yaho = await YahoFactory.deploy();
-    const HashiRegistryFactory = await ethers.getContractFactory(
-      "HashiRegistry"
-    );
+
+    const HashiRegistryFactory =
+      await ethers.getContractFactory("HashiRegistry");
     hashiRegistry = await HashiRegistryFactory.deploy();
+
     const HashiDVNAdapterFeelibRegistry = await ethers.getContractFactory(
-      "HashiDVNAdapterFeeLib"
+      "HashiDVNAdapterFeeLib",
     );
     hashiDVNAdaterfeelib = await HashiDVNAdapterFeelibRegistry.deploy(
-      await hashiRegistry.getAddress()
+      await hashiRegistry.getAddress(),
     );
-    const MessageRelayMockFactory = await ethers.getContractFactory(
-      "MessageRelayMock"
-    );
+
+    const MessageRelayMockFactory =
+      await ethers.getContractFactory("MessageRelayMock");
     messageRelayA = await MessageRelayMockFactory.deploy();
     messageRelayB = await MessageRelayMockFactory.deploy();
     sourceAdapters_ = [
@@ -67,7 +69,7 @@ describe("Hashi DVN Adapter test", function () {
       await messageRelayB.getAddress(),
     ];
     const MessageRelayAdapterMockFactory = await ethers.getContractFactory(
-      "MessageRelayAdapterMock"
+      "MessageRelayAdapterMock",
     );
     messageRelayAdapterA = await MessageRelayAdapterMockFactory.deploy();
     messageRelayAdapterB = await MessageRelayAdapterMockFactory.deploy();
@@ -75,24 +77,25 @@ describe("Hashi DVN Adapter test", function () {
       await messageRelayAdapterA.getAddress(),
       await messageRelayAdapterB.getAddress(),
     ];
+
     const SendLibMockFactory = await ethers.getContractFactory("SendLibMock");
     sendLibMock = await SendLibMockFactory.deploy();
-    const ReceiveLibMockFactory = await ethers.getContractFactory(
-      "ReceiveLibMock"
-    );
+
+    const ReceiveLibMockFactory =
+      await ethers.getContractFactory("ReceiveLibMock");
     receiveLibMock = await ReceiveLibMockFactory.deploy();
-    const packetEncoderFactory = await ethers.getContractFactory(
-      "PacketEncoder"
-    );
+
+    const packetEncoderFactory =
+      await ethers.getContractFactory("PacketEncoder");
     packetEncoder = await packetEncoderFactory.deploy();
-    const HashiDVNAdapterFactory = await ethers.getContractFactory(
-      "HashiDVNAdapter"
-    );
+
+    const HashiDVNAdapterFactory =
+      await ethers.getContractFactory("HashiDVNAdapter");
     hashiDVNAdapter = await HashiDVNAdapterFactory.deploy(
       [await admin.getAddress()],
       await yaho.getAddress(),
       await hashi.getAddress(),
-      await hashiRegistry.getAddress()
+      await hashiRegistry.getAddress(),
     );
 
     await hashiDVNAdapter.connect(admin).setReceiveLibs([
@@ -105,17 +108,20 @@ describe("Hashi DVN Adapter test", function () {
     await hashiDVNAdapter
       .connect(admin)
       .setWorkerFeeLib(await hashiDVNAdaterfeelib.getAddress());
+
+    await hashiDVNAdapter.connect(admin).setEidToChainID(srcEid, srcChainId);
+    await hashiDVNAdapter.connect(admin).setEidToChainID(dstEid, dstChainId);
+
     await hashiRegistry.setSourceAdaptersPair(
       srcEid,
       dstEid,
       sourceAdapters_,
-      destAdapters_
+      destAdapters_,
     );
     await hashiRegistry.setDestAdapters(srcEid, dstEid, destAdapters_);
     await hashiRegistry.setDestFee(dstEid, 1_000);
 
-    await hashiDVNAdapter.connect(admin).setEidToChainID(srcEid, srcChainId);
-    await hashiDVNAdapter.connect(admin).setEidToChainID(dstEid, dstChainId);
+    // construct function input
     packet = {
       nonce: 0,
       srcEid,
@@ -130,7 +136,7 @@ describe("Hashi DVN Adapter test", function () {
     payload = await packetEncoder.encode(
       zeroPadHex(await receiveLibMock.getAddress(), 64),
       packetHeader,
-      payloadHash
+      payloadHash,
     );
     assignJobParam = {
       dstEid,
@@ -143,7 +149,6 @@ describe("Hashi DVN Adapter test", function () {
 
   it("Should assign job correctly", async function () {
     const sendLibAddr = await sendLibMock.getAddress();
-    console.log(sendLibAddr);
     await impersonateAccount(sendLibAddr);
     await setBalance(sendLibAddr, 100n ** 18n);
     let sendLibMockSigner = await ethers.getSigner(sendLibAddr);
@@ -155,7 +160,7 @@ describe("Hashi DVN Adapter test", function () {
     expect(
       await hashiDVNAdapter
         .connect(sendLibMockSigner)
-        .assignJob(assignJobParam, "0x")
+        .assignJob(assignJobParam, "0x"),
     )
       .to.emit(messageRelayA, "MessageRelayed")
       .withArgs(sourceAdapters_[0], messageId)
@@ -165,7 +170,6 @@ describe("Hashi DVN Adapter test", function () {
 
   it("Should verify Message Hash correctly", async function () {
     const sendLibAddr = await sendLibMock.getAddress();
-    console.log(sendLibAddr);
     await impersonateAccount(sendLibAddr);
     await setBalance(sendLibAddr, 100n ** 18n);
     let sendLibMockSigner = await ethers.getSigner(sendLibAddr);
@@ -179,23 +183,27 @@ describe("Hashi DVN Adapter test", function () {
       "0x0000000000000000000000000000000000000000000000000000000000000000";
 
     await expect(
-      await messageRelayAdapterA.storeHash(srcChainId, messageId, payloadHash)
+      await messageRelayAdapterA.storeHash(srcChainId, messageId, payloadHash),
     ).to.emit(messageRelayAdapterA, "HashStored");
     await expect(
-      await messageRelayAdapterB.storeHash(srcChainId, messageId, payloadHash)
+      await messageRelayAdapterB.storeHash(srcChainId, messageId, payloadHash),
     ).to.emit(messageRelayAdapterB, "HashStored");
 
     await expect(
-      await hashiDVNAdapter.connect(admin).verifyMessageHash(messageId, payload)
+      await hashiDVNAdapter
+        .connect(admin)
+        .verifyMessageHash(messageId, payload),
     )
       .to.emit(hashiDVNAdapter, "HashFromAdaptersMatched")
-      .withArgs(messageId, payloadHash);
+      .withArgs(messageId, payloadHash)
+      .to.emit(hashiDVNAdapter, "MessageVerified")
+      .withArgs(0, payloadHash);
 
     // check if the hashLookup[headerHash=>payloadHash=>dvn] = Verification{submitted, confirmations} from receiveLib is called;
     const verification = await receiveLibMock.hashLookup(
       ethers.keccak256(packetHeader),
       payloadHash,
-      await hashiDVNAdapter.getAddress()
+      await hashiDVNAdapter.getAddress(),
     );
     expect(verification[0]).to.equal(true);
   });
@@ -206,8 +214,8 @@ describe("Hashi DVN Adapter test", function () {
         dstEid,
         0,
         "0x0000000000000000000000000000000000000000",
-        "0x"
-      )
+        "0x",
+      ),
     ).to.equal(1_000);
   });
 });

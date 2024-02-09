@@ -19,7 +19,10 @@ library BitMaps {
     /**
      * @dev Sets the bit at `index`.
      */
-    function set(BitMap256 bitmap, uint8 index) internal pure returns (BitMap256) {
+    function set(
+        BitMap256 bitmap,
+        uint8 index
+    ) internal pure returns (BitMap256) {
         uint256 mask = 1 << index;
         return BitMap256.wrap(BitMap256.unwrap(bitmap) | mask);
     }

@@ -21,5 +21,8 @@ interface IHashiDVNAdapter {
         uint256 indexed messageId,
         bytes32 indexed hash
     );
+    event MessageVerified(uint64 indexed nonce, bytes32 indexed hash);
     event LogError(string error);
+
+    error HashiMismatch();
 }

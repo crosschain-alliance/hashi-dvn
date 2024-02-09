@@ -41,7 +41,11 @@ interface ILayerZeroPriceFeed {
 
     function nativeTokenPriceUSD() external view returns (uint128);
 
-    function getFee(uint32 _dstEid, uint256 _callDataSize, uint256 _gas) external view returns (uint256);
+    function getFee(
+        uint32 _dstEid,
+        uint256 _callDataSize,
+        uint256 _gas
+    ) external view returns (uint256);
 
     function getPrice(uint32 _dstEid) external view returns (Price memory);
 
@@ -51,11 +55,27 @@ interface ILayerZeroPriceFeed {
         uint32 _dstEid,
         uint256 _callDataSize,
         uint256 _gas
-    ) external view returns (uint256 fee, uint128 priceRatio, uint128 priceRatioDenominator, uint128 nativePriceUSD);
+    )
+        external
+        view
+        returns (
+            uint256 fee,
+            uint128 priceRatio,
+            uint128 priceRatioDenominator,
+            uint128 nativePriceUSD
+        );
 
     function estimateFeeOnSend(
         uint32 _dstEid,
         uint256 _callDataSize,
         uint256 _gas
-    ) external payable returns (uint256 fee, uint128 priceRatio, uint128 priceRatioDenominator, uint128 nativePriceUSD);
+    )
+        external
+        payable
+        returns (
+            uint256 fee,
+            uint128 priceRatio,
+            uint128 priceRatioDenominator,
+            uint128 nativePriceUSD
+        );
 }

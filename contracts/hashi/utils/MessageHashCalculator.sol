@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.17;
 
-import { Message } from "../interfaces/IMessage.sol";
+import {Message} from "../interfaces/IMessage.sol";
 
 contract MessageHashCalculator {
     /// @dev Calculates the ID of a given message.
@@ -17,6 +17,8 @@ contract MessageHashCalculator {
         address sender,
         Message memory message
     ) public pure returns (bytes32 calculatedHash) {
-        calculatedHash = keccak256(abi.encode(chainId, id, origin, sender, message));
+        calculatedHash = keccak256(
+            abi.encode(chainId, id, origin, sender, message)
+        );
     }
 }

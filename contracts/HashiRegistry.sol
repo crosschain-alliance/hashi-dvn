@@ -4,7 +4,10 @@ pragma solidity ^0.8.20;
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-/// Hashi Registry contract to record source<->dest adapters pair address, and their fee
+/// @title Hashi Registry contract to record source<->dest adapters pair address, and their fee
+/// @author zeng
+/// @notice set and get fee for specific route required by Hashi adapters
+/// @dev
 contract HashiRegistry is Ownable {
     struct AdapterPair {
         address sourceAdapter;
@@ -29,8 +32,8 @@ contract HashiRegistry is Ownable {
     );
 
     /// @notice called by HashiDVNAdapter contract from source chain
-    /// @param sourceEid source eid of LZ endpoint
-    /// @param destEid destination eid of LZ endpoint
+    /// @param sourceEid LZ v2 source chain endpoint id
+    /// @param destEid LZ v2 destination chain endpoint id
     function getSourceAdaptersPair(
         uint32 sourceEid,
         uint32 destEid
@@ -39,8 +42,8 @@ contract HashiRegistry is Ownable {
     }
 
     /// @notice set source adapters pair, only called by owner
-    /// @param sourceEid source eid of LZ endpoint
-    /// @param destEid destination eid of LZ endpoint
+    /// @param sourceEid LZ v2 source chain endpoint id
+    /// @param destEid LZ v2 destination chain endpoint id
     /// @param _sourceAdapters an array of source chain Hashi message relay adapters
     /// @param _destAdapters an array of destination chain Hashi adapter corresponding to the source chain message relay adapters
     ///         The index of _sourceAdapters and _destAdapters should be the same for a pair of adapter
@@ -69,8 +72,8 @@ contract HashiRegistry is Ownable {
     }
 
     /// @notice called by HashiDVNAdapter contract from destination chain
-    /// @param sourceEid source eid of LZ endpoint
-    /// @param destEid destination eid of LZ endpoint
+    /// @param sourceEid LZ v2 source chain endpoint id
+    /// @param destEid LZ v2 destination chain endpoint id
     function getDestAdapters(
         uint32 sourceEid,
         uint32 destEid
@@ -79,9 +82,9 @@ contract HashiRegistry is Ownable {
     }
 
     /// @notice set dest adapters pair, only called by owner
-    /// @param sourceEid source eid of LZ endpoint
-    /// @param destEid destination eid of LZ endpoint
-    /// @param _destAdapters an array of destination chain Hashi Adapters, that will be called by Hashi.getHash
+    /// @param sourceEid LZ v2 source chain endpoint id
+    /// @param destEid LZ v2 destination chain endpoint id
+    /// @param _destAdapters an array of destination chain Hashi Adapters, that will be called using Hashi.getHash
     function setDestAdapters(
         uint32 sourceEid,
         uint32 destEid,
@@ -100,14 +103,14 @@ contract HashiRegistry is Ownable {
     }
 
     /// @notice get destination fee for sending message hash through Hashi adapters
-    /// @param destEid destination chain eid of LZ endpoint
+    /// @param destEid LZ v2 destination chain endpoint id
     /// TODO calculate actual gas used for each adapters
     function getDestFee(uint32 destEid) external view returns (uint256 fee) {
         return hashiFee[destEid];
     }
 
     /// @notice set fee for destination adapters, only called by owner
-    /// @param destEid destination chain eid of LZ endpoint
+    /// @param destEid LZ v2 destination chain endpoint id
     /// @param fee fee for using Hashi adapters to relay message hash to destination chain
     function setDestFee(uint32 destEid, uint256 fee) external onlyOwner {
         hashiFee[destEid] = fee;

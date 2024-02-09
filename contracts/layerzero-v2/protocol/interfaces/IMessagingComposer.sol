@@ -3,8 +3,19 @@
 pragma solidity >=0.8.0;
 
 interface IMessagingComposer {
-    event ComposeSent(address from, address to, bytes32 guid, uint16 index, bytes message);
-    event ComposeDelivered(address from, address to, bytes32 guid, uint16 index);
+    event ComposeSent(
+        address from,
+        address to,
+        bytes32 guid,
+        uint16 index,
+        bytes message
+    );
+    event ComposeDelivered(
+        address from,
+        address to,
+        bytes32 guid,
+        uint16 index
+    );
     event LzComposeAlert(
         address indexed from,
         address indexed to,
@@ -25,7 +36,12 @@ interface IMessagingComposer {
         uint16 _index
     ) external view returns (bytes32 messageHash);
 
-    function sendCompose(address _to, bytes32 _guid, uint16 _index, bytes calldata _message) external;
+    function sendCompose(
+        address _to,
+        bytes32 _guid,
+        uint16 _index,
+        bytes calldata _message
+    ) external;
 
     function lzCompose(
         address _from,

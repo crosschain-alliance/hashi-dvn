@@ -5,7 +5,7 @@ async function main() {
   const hashiRegistry = await hre.ethers.deployContract(
     "HashiRegistry",
     [],
-    owner
+    owner,
   );
 
   await hashiRegistry.waitForDeployment();
@@ -13,7 +13,7 @@ async function main() {
   console.log(
     `Hashi Registry deployed to ${await hashiRegistry.getAddress()} on  ${
       hre.network.name
-    }`
+    }`,
   );
 }
 

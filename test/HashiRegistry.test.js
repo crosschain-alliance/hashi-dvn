@@ -13,39 +13,42 @@ describe("HashiRegistry test", function () {
     "0x0000000000000000000000000000000000000033",
     "0x0000000000000000000000000000000000000044",
   ];
+
   beforeEach(async function () {
-    const HashiRegistryFactory = await ethers.getContractFactory(
-      "HashiRegistry"
-    );
+    const HashiRegistryFactory =
+      await ethers.getContractFactory("HashiRegistry");
     hashiRegistry = await HashiRegistryFactory.deploy();
   });
+
   it("Should set destination fee correctly", async function () {
     await hashiRegistry.setDestFee(dstEid, 100);
     let fee = await hashiRegistry.getDestFee(dstEid);
     expect(fee).to.equal(100n);
   });
+
   it("Should set source adapters pair correctly", async function () {
     await expect(
       await hashiRegistry.setSourceAdaptersPair(
         srcEid,
         dstEid,
         sourceAdapters_,
-        destAdapters_
-      )
+        destAdapters_,
+      ),
     )
       .to.emit(hashiRegistry, "NewSourceAdaptersPairSet")
       .withArgs(srcEid, dstEid, anyValue, anyValue);
   });
+
   it("Should get source adapters pair correctly", async function () {
     await hashiRegistry.setSourceAdaptersPair(
       srcEid,
       dstEid,
       sourceAdapters_,
-      destAdapters_
+      destAdapters_,
     );
     let adaptersPair = await hashiRegistry.getSourceAdaptersPair(
       srcEid,
-      dstEid
+      dstEid,
     );
 
     expect(adaptersPair[0][0]).to.equal(sourceAdapters_[0]);
@@ -57,11 +60,12 @@ describe("HashiRegistry test", function () {
   it("Should set destination adapters correctly", async function () {
     await hashiRegistry.setDestAdapters(srcEid, dstEid, destAdapters_);
     await expect(
-      await hashiRegistry.setDestAdapters(srcEid, dstEid, destAdapters_)
+      await hashiRegistry.setDestAdapters(srcEid, dstEid, destAdapters_),
     )
       .to.emit(hashiRegistry, "NewDestAdaptersPairSet")
       .withArgs(srcEid, dstEid, anyValue);
   });
+
   it("Should get destination adapters correctly", async function () {
     await hashiRegistry.setDestAdapters(srcEid, dstEid, destAdapters_);
     let destAdapters = await hashiRegistry.getDestAdapters(srcEid, dstEid);

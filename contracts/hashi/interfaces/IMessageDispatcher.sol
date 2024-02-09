@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: LGPL-3.0-only
 pragma solidity ^0.8.17;
 
-import { Message } from "./IMessage.sol";
+import {Message} from "./IMessage.sol";
 
 interface IMessageDispatcher {
     event MessageDispatched(
@@ -12,5 +12,7 @@ interface IMessageDispatcher {
         bytes data
     );
 
-    function dispatchMessages(Message[] memory messages) external payable returns (bytes32[] memory messageIds);
+    function dispatchMessages(
+        Message[] memory messages
+    ) external payable returns (bytes32[] memory messageIds);
 }
