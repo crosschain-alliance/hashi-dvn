@@ -20,7 +20,7 @@ This is the end to end workflow of how a Hashi DVN Adapter will be used by an [O
 
 In order to use Hashi DVN for your Oapp, Oapp developer need to register the DVN in the source endpoint's config.
 
-1. Oapp calls `Endpoint.[setConfig](https://docs.layerzero.network/contracts/configure-dvns#set-config)` to add HashiDVN as one of the DVN.
+1. Oapp calls `Endpoint.setConfig` to add HashiDVN as one of the DVN. [url](https://docs.layerzero.network/contracts/configure-dvns#set-config)`
 
 ### Configuration from Hashi
 
@@ -70,6 +70,10 @@ There are two steps of verification:
 ## Documentation
 
 https://hashi-doc.gitbook.io/hashi/v0.1/application
+
+## Reference
+1. LayerZero v2: https://docs.layerzero.network/
+2. Hashi: https://crosschain-alliance.gitbook.io/hashi/v0.1/readme
 
 ## Usage
 
