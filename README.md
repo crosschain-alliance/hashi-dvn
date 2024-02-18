@@ -56,7 +56,7 @@ There are two steps of verification:
 
 1. call `HashiDVNAdapter.verifyMessageHash(messageId, payload)`
 2. HashiDVNAdapterl calls `Hashi.getHash` to check if all adapters agree on the same hash for 1st verification.
-3. If true, check for 2nd verificaiton and calls `ReceiveLib.verify` to set verify mapping to true.
+3. If true, check for 2nd verificaiton and calls `ReceiveLib.verify` to set `verify` mapping to true.
 4. Executor calls `commitAndExecute` message
 
 
@@ -69,7 +69,7 @@ There are two steps of verification:
 
 ## Documentation
 
-https://hashi-doc.gitbook.io/hashi/v0.1/application
+https://crosschain-alliance.gitbook.io/hashi/v0.1/application/hashi-dvn
 
 ## Reference
 1. LayerZero v2: https://docs.layerzero.network/
