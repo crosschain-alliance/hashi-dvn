@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.20;
 
-import {DVNAdapterBase} from "./layerzero-v2/messagelib/uln/dvn/adapters/DVNAdapterBase.sol";
-import {DVNAdapterMessageCodec} from "./layerzero-v2/messagelib/uln/dvn/adapters/libs/DVNAdapterMessageCodec.sol";
+import {DVNAdapterBase} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/dvn/adapters/DVNAdapterBase.sol";
+import {DVNAdapterMessageCodec} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/dvn/adapters/libs/DVNAdapterMessageCodec.sol";
 import {Yaho} from "./hashi/Yaho.sol";
 import {Hashi} from "./hashi/Hashi.sol";
 import {Message} from "./hashi/interfaces/IMessageDispatcher.sol";

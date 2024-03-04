@@ -2,11 +2,11 @@
 
 pragma solidity ^0.8.20;
 
-import {SetConfigParam} from "../../layerzero-v2/protocol/interfaces/IMessageLibManager.sol";
-import {MessagingFee} from "../../layerzero-v2/protocol/interfaces/ILayerZeroEndpointV2.sol";
-import {MessageLibType} from "../../layerzero-v2/protocol/interfaces/IMessageLib.sol";
-import {ISendLib, Packet} from "../../layerzero-v2/protocol/interfaces/ISendLib.sol";
-import {Transfer} from "../../layerzero-v2/protocol/libs/Transfer.sol";
+import {SetConfigParam} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLibManager.sol";
+import {MessagingFee} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
+import {MessageLibType} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLib.sol";
+import {ISendLib, Packet} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ISendLib.sol";
+import {Transfer} from "@layerzerolabs/lz-evm-protocol-v2/contracts/libs/Transfer.sol";
 
 contract SendLibMock is ISendLib {
     mapping(address worker => uint256) public fees;
