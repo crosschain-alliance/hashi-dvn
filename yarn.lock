@@ -429,21 +429,6 @@
     "@jridgewell/resolve-uri" "^3.0.3"
     "@jridgewell/sourcemap-codec" "^1.4.10"
 
-"@layerzerolabs/lz-evm-messagelib-v2@^2.1.13":
-  version "2.1.13"
-  resolved "https://registry.yarnpkg.com/@layerzerolabs/lz-evm-messagelib-v2/-/lz-evm-messagelib-v2-2.1.13.tgz#77f20c9bf860e068855dde69dcae18c33b764acb"
-  integrity sha512-kyFZE+nlSle+L5dnmHU2AdvVed6lCA0BbrA3d0wJJZ+6bsBVlg4otFLBkQgTBaaNwzT3+O7oC23ufDcnWKBf3Q==
-
-"@layerzerolabs/lz-evm-oapp-v2@^2.1.13":
-  version "2.1.13"
-  resolved "https://registry.yarnpkg.com/@layerzerolabs/lz-evm-oapp-v2/-/lz-evm-oapp-v2-2.1.13.tgz#f841fa43f17f20030a95e00f4207926a10b770e1"
-  integrity sha512-l8EqYM1OqbIuaiygJSnFVwGQBb62iL+x1WHvVa6Qf1CxNvhViJFvHnErle2dwUuGUwHlfvtT6AVffnYfWk0D3g==
-
-"@layerzerolabs/lz-evm-protocol-v2@^2.1.13":
-  version "2.1.13"
-  resolved "https://registry.yarnpkg.com/@layerzerolabs/lz-evm-protocol-v2/-/lz-evm-protocol-v2-2.1.13.tgz#0e4e2a97b473233e1b6932db770448a58258166f"
-  integrity sha512-JAXywtiWlBdJO/6CnrEKEoLQWWJG5tFfbxPCTZYzCe2mWrEAQ19GJSFyAGa7nh3fHlebzD2FDnuof6fZt/X4eA==
-
 "@metamask/eth-sig-util@^4.0.0":
   version "4.0.1"
   resolved "https://registry.npmjs.org/@metamask/eth-sig-util/-/eth-sig-util-4.0.1.tgz"

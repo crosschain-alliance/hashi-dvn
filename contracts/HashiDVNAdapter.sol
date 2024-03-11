@@ -202,7 +202,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
 
         /// 2nd verification from LZ payload passed
         if (payloadHash == reportedHash) {
-            _decodeAndVerify(message);
+            _decodeAndVerify(_srcEid, message);
             emit MessageVerified(nonce, reportedHash);
         } else {
             revert HashiMismatch();
