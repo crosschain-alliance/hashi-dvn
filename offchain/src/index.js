@@ -1,27 +1,20 @@
-const { MessageRelayedEventListener, DVNEventListener } = require('./src/EventListener');
-const { HashiDVNSender } = require('./src/HashiDVNSender');
-const { ViemClient } = require('./viemClient');
-const { chainConfig } = require('../config');
-const { gnosis, optimism } = require('viem/chains');
-
-const { createWalletClient, http, publicActions } = require('viem');
-const { privateKeyToAccount } = require('viem/accounts');
+const { MessageRelayedEventListener, DVNEventListener } = require('./EventListener');
+const { HashiDVNSender } = require('./HashiDVNSender');
+const { ViemClient } = require('./ViemClient');
 
 async function main(){
  
 
-    const sourceChain = "gnosis";
+    const sourceChain = "localhost";
     const destChain = "optimism";
 
     const viemClient = new ViemClient(`0x${process.env.DEPLOYER_PRIV_KEY}`);
 
     const messageRelayedEventListener = new MessageRelayedEventListener(viemClient, sourceChain, destChain );
-    const stopMessageRelay = messageRelayedEventListener.start();
-    const DVNEventListener = new DVNEventListener(viemClient, sourceChain, destChain);
-    const stopDVN = DVNEventListener.start();
-    const hashiDVNSender = new HashiDVNSender(viemClient, destChain);
-    hashiDVNSender.addEvent(messageRelayedEventListener.getMessageIdsAndHash, DVNEventListener.getPackets);
-    hashiDVNSender.start();
+    const stopMessageRelay = await messageRelayedEventListener.start();
+    const dvnEventListener = new DVNEventListener(viemClient, sourceChain, destChain);
+    const stopDVN = await dvnEventListener.start();
+    const hashiDVNSender = new HashiDVNSender(viemClient, destChain, messageRelayedEventListener, dvnEventListener);
 
 }
 

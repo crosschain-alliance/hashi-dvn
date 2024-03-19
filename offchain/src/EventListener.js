@@ -1,13 +1,8 @@
-// export viem client for each chains
-
-// your-file.js
-const { createWalletClient, http, publicActions, createPublicClient, parseAbiItem, parseEventLogs } = require('viem');
-const { privateKeyToAccount } = require('viem/accounts');
-const { gnosis, optimism } = require('viem/chains');
+const { parseEventLogs } = require('viem');
 const { abi: MessageRelayABI } = require('../abi/MockMessageRelay.json');
 const { abi: MessageRelayAdapterABI } = require('../abi/MockMessageRelayAdapter.json')
 const { abi: EndpointV2ABI } = require('../abi/EndpointV2.json');
-const {PacketSerializer} = require('./encoding');
+const {PacketSerializer} = require('./utils/encoding');
 require("dotenv").config();
 
 class MessageRelayedEventListener {
@@ -27,18 +22,23 @@ class MessageRelayedEventListener {
         const sourceAddresses = this.viemClient.getAddress(this.sourceChain)
         const destAddresses = this.viemClient.getAddress(this.destChain)
         const sourceChainClient = this.viemClient.getClient(this.sourceChain)
+    
         const destChainClient = this.viemClient.getClient(this.destChain)
-        console.log("listening",addresses.yaho)
+        console.log("listening ",sourceAddresses.mockMessageRelay)
         this.unwatch = sourceChainClient.watchContractEvent({
             address: sourceAddresses.mockMessageRelay,
             abi: MessageRelayABI,
             event: 'MessageRelayed',
-            onLogs: logs => this.messageRelayedIds.push(logs.topics[2])// get message Id from messageRelayed event
+            onLogs: logs => {
+                console.log("new MessageRelayed event ", logs)
+                this.messageRelayedIds.push(logs.topics[2])
+                
+            }// get message Id from messageRelayed event
         })
 
         for(let i = 0; i<this.messageRelayedIds.length; i++){
             const messageHash = await destChainClient.readContract({
-                address: addresses.yaho,
+                address: sourceAddresses.yaho,
                 abi: YahoABI,
                 functionName: 'hashes',
                 args: [id]
@@ -56,22 +56,23 @@ class MessageRelayedEventListener {
                 'id': this.messageRelayedIds[i],
                 'messageHash': messageHash
             })
+            console.log(`Successfully store hash on ${this.destChain}, tx: ${tx}`)
         }
-        console.log(`Successfully store hash on ${this.destChain}: ${tx}`)
-     
+ 
+        this.handleCallback();
     
         return this.stop.bind(this);
     }
 
-    getMessageIdsAndHash(){
-        return this.getMessageIdsAndHash;
+    handleCallback(){
+
     }
+
 
     stop() {
         if (this.unwatch) {
             this.unwatch(); // Stop watching the contract event
         }
-
 
         console.log('Event listener stopped.');
     }
@@ -93,24 +94,25 @@ class DVNEventListener {
     async start(){
 
         const sourceAddresses = this.viemClient.getAddress(this.sourceChain)
-        const destAddresses = this.viemClient.getAddress(this.destChain)
         const sourceChainClient = this.viemClient.getClient(this.sourceChain)
-        const destChainClient = this.viemClient.getClient(this.destChain)
+
         this.unwatch = sourceChainClient.watchContractEvent({
             address: sourceAddresses.endpoint,
             abi: EndpointV2ABI,
             event: 'PacketSent',
-           // event PacketSent(bytes encodedPayload, bytes options, uint256 nativeFee, uint256 lzTokenFee);
+           // event PacketSent(bytes encodedPayload, bytes options, address sendLibrary);
             onLogs: logs => { processLogs(logs) }
-                
-         
+
             })
-        }
+        this.handleCallback();
+
+    }
 
 
 
     async processLogs(log){
-        //this.packets.push(logs.topics[1])// get encodedPayload from event
+        console.log("new PacketSent event ", log);
+
         
         // get all the logs from this transaction
             
@@ -133,19 +135,21 @@ class DVNEventListener {
                 for(let i = 0; i<logs[i].args.requiredDVNs.length; i++){
                     if (requiredDVNs[i]== sourceAddresses.hashiDVNAdapter){
                         console.log("Hashi DVN Adapter fee paid")
-                        isHashiDVNAssigned = true
+                        isHashiDVNAssigned = true;
+                        break;
                     }
                 }
                 for(let i = 0; i<logs[i].args.optionalDVNs.length; i++){
                     if (requiredDVNs[i]== sourceAddresses.hashiDVNAdapter){
                         console.log("Hashi DVN Adapter fee paid")
                         isHashiDVNAssigned = true
-                        
+                        break;
                     }
                 }
             }
 
             if(logs[i].eventName=='PacketSent' && isHashiDVNAssigned){
+                console.log("Hashi is assigned")
                 const encodedPayload = logs[i].args.encodedPayload;
                 console.log(`New Packet Sent event with encodedPayload ${encodedPayload}`)
                 const packet = PacketSerializer.deserialize(encodedPayload);
@@ -165,8 +169,9 @@ class DVNEventListener {
 
     }
 
-    getPackets() {
-        return this.packets;
+    
+    handleCallback(){
+
     }
 
     stop(){
@@ -174,11 +179,10 @@ class DVNEventListener {
             this.unwatch(); // Stop watching the contract event
         }
 
-
         console.log('Event listener stopped.');
     }
 
-
 }
+
 module.exports = {MessageRelayedEventListener, DVNEventListener}
 
