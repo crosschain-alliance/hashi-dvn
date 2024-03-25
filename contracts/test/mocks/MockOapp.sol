@@ -6,7 +6,7 @@ import {UlnConfig, ExecutorConfig} from "@layerzerolabs/lz-evm-messagelib-v2/con
 import {ILayerZeroEndpointV2} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ILayerZeroEndpointV2.sol";
 import {SetConfigParam} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/IMessageLibManager.sol";
 
-contract TestApp is OApp {
+contract MockOapp is OApp {
     struct MessageDetails {
         Origin origin;
         bytes32 guid;

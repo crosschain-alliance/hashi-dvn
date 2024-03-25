@@ -7,7 +7,7 @@ import {ILayerZeroEndpointV2, Origin} from "@layerzerolabs/lz-evm-protocol-v2/co
 
 import {Ownable} from "@openzeppelin/contracts/access/Ownable.sol";
 
-contract SimpleExecutor is Ownable, ILayerZeroExecutor {
+contract MockExecutor is Ownable, ILayerZeroExecutor {
     event Withdraw(ISendLib indexed lib, address to, uint256 amount);
     event MessageFeeSet(uint32 indexed dstEid, uint256 messageFee);
 
