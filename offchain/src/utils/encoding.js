@@ -1,6 +1,6 @@
 // The encoder presently types according to ethereum addresses, this is to make it clear that zexecutor presently only supports the EVM.
 // A production deployment would likely want to support other address types as well.
-// import from https://github.com/0xpaladinsecurity/zexecutor/blob/main/src/encoding.ts
+// modified from https://github.com/0xpaladinsecurity/zexecutor/blob/main/src/encoding.ts
 
 const { pad, slice, keccak256, encodePacked } = require("viem");
 
@@ -18,7 +18,24 @@ const MESSAGE_OFFSET = 113;
 exports.trim0x = function (str) {
   return str.replace(/^0x/, "");
 };
+// receive lib, payloadHash, packetHeader
+exports.getDVNMessage = function getDVNMessage(
+  receiveLib,
+  payloadHash,
+  packetHeader,
+) {
+  //receiceLib, packetHeader, payloadHash
+  const RECEIVELIB_OFFSET = 0; // 32 bytes
+  const PAYLOADHASH_OFFSET = 32; // 32 bytes
+  const PACKETHEADER_OFFSET = 64; // 81 bytes
 
+  const buffer = Buffer.alloc(145); // 145 bytes
+  buffer.write(exports.trim0x(receiveLib), "hex");
+  buffer.write(exports.trim0x(payloadHash), PAYLOADHASH_OFFSET, "hex");
+  buffer.write(exports.trim0x(packetHeader), PACKETHEADER_OFFSET, "hex");
+
+  return "0x" + buffer.toString("hex");
+};
 class PacketSerializer {
   static serialize(packet) {
     return PacketV1Codec.encode(packet);
@@ -26,31 +43,34 @@ class PacketSerializer {
 
   static deserialize(bytesLike) {
     let codec;
-    if (bytesLike instanceof Uint8Array) {
-      codec = PacketV1Codec.fromBytes(bytesLike);
-    } else {
-      codec = PacketV1Codec.from(bytesLike);
-    }
+    // if (bytesLike instanceof Uint8Array) {
+    //   codec = PacketV1Codec.fromBytes(bytesLike);
+    // } else {
+    //   codec = PacketV1Codec.from(bytesLike);
+    // }
+    codec = new PacketV1Codec(bytesLike);
     return codec.toPacket();
   }
 
   static getHeader(bytesLike) {
     let codec;
-    if (bytesLike instanceof Uint8Array) {
-      codec = PacketV1Codec.fromBytes(bytesLike);
-    } else {
-      codec = PacketV1Codec.from(bytesLike);
-    }
+    // if (bytesLike instanceof Uint8Array) {
+    //   codec = PacketV1Codec.fromBytes(bytesLike);
+    // } else {
+    //   codec = PacketV1Codec.from(bytesLike);
+    // }
+    codec = new PacketV1Codec(bytesLike);
     return codec.header();
   }
 
   static getPayloadHash(bytesLike) {
     let codec;
-    if (bytesLike instanceof Uint8Array) {
-      codec = PacketV1Codec.fromBytes(bytesLike);
-    } else {
-      codec = PacketV1Codec.from(bytesLike);
-    }
+    // if (bytesLike instanceof Uint8Array) {
+    //   codec = PacketV1Codec.fromBytes(bytesLike);
+    // } else {
+    //   codec = PacketV1Codec.from(bytesLike);
+    // }
+    codec = new PacketV1Codec(bytesLike);
     return codec.payloadHash();
   }
 }
@@ -77,12 +97,22 @@ class PacketV1Codec {
     buffer.writeUInt8(packet.version, PACKET_VERSION_OFFSET);
     buffer.writeBigUInt64BE(BigInt(packet.nonce), NONCE_OFFSET);
     buffer.writeUInt32BE(packet.srcEid, SRC_CHAIN_OFFSET);
-    buffer.write(exports.trim0x(pad(packet.sender)), SRC_ADDRESS_OFFSET, 32, "hex");
+    buffer.write(
+      exports.trim0x(pad(packet.sender)),
+      SRC_ADDRESS_OFFSET,
+      32,
+      "hex",
+    );
     buffer.writeUInt32BE(packet.dstEid, DST_CHAIN_OFFSET);
-    buffer.write(exports.trim0x(pad(packet.receiver)), DST_ADDRESS_OFFSET, 32, "hex");
+    buffer.write(
+      exports.trim0x(pad(packet.receiver)),
+      DST_ADDRESS_OFFSET,
+      32,
+      "hex",
+    );
     buffer.write(exports.trim0x(packet.guid), GUID_OFFSET, 32, "hex");
     buffer.write(message, MESSAGE_OFFSET, message.length / 2, "hex");
-    return ("0x" + buffer.toString("hex"));
+    return "0x" + buffer.toString("hex");
   }
 
   version() {
@@ -98,10 +128,10 @@ class PacketV1Codec {
   }
 
   sender() {
-    return ("0x" +
-      this.buffer
-        .slice(SRC_ADDRESS_OFFSET, DST_CHAIN_OFFSET)
-        .toString("hex"));
+    return (
+      "0x" +
+      this.buffer.slice(SRC_ADDRESS_OFFSET, DST_CHAIN_OFFSET).toString("hex")
+    );
   }
 
   senderAddressB20() {
@@ -113,10 +143,9 @@ class PacketV1Codec {
   }
 
   receiver() {
-    return ("0x" +
-      this.buffer
-        .slice(DST_ADDRESS_OFFSET, GUID_OFFSET)
-        .toString("hex"));
+    return (
+      "0x" + this.buffer.slice(DST_ADDRESS_OFFSET, GUID_OFFSET).toString("hex")
+    );
   }
 
   receiverAddressB20() {
@@ -124,15 +153,13 @@ class PacketV1Codec {
   }
 
   guid() {
-    return ("0x" +
-      this.buffer
-        .slice(GUID_OFFSET, MESSAGE_OFFSET)
-        .toString("hex"));
+    return (
+      "0x" + this.buffer.slice(GUID_OFFSET, MESSAGE_OFFSET).toString("hex")
+    );
   }
 
   message() {
-    return ("0x" +
-      this.buffer.slice(MESSAGE_OFFSET).toString("hex"));
+    return "0x" + this.buffer.slice(MESSAGE_OFFSET).toString("hex");
   }
 
   payloadHash() {
@@ -140,13 +167,11 @@ class PacketV1Codec {
   }
 
   payload() {
-    return ("0x" +
-      this.buffer.slice(GUID_OFFSET).toString("hex"));
+    return "0x" + this.buffer.slice(GUID_OFFSET).toString("hex");
   }
 
   header() {
-    return ("0x" +
-      this.buffer.slice(0, GUID_OFFSET).toString("hex"));
+    return "0x" + this.buffer.slice(0, GUID_OFFSET).toString("hex");
   }
 
   headerHash() {
@@ -192,6 +217,14 @@ function bytes32ToEthAddress(addr) {
   return result;
 }
 
+function zeroPadHex(value, length) {
+  const hexValue = value.startsWith("0x") ? value.slice(2) : value;
+  const paddedHex =
+    "0x" + "0".repeat(Math.max(0, length - hexValue.length)) + hexValue;
+  return paddedHex;
+}
+
 exports.PacketSerializer = PacketSerializer;
 exports.packetToMessageOrigin = packetToMessageOrigin;
 exports.calculateGuid = calculateGuid;
+exports.zeroPadHex = zeroPadHex;

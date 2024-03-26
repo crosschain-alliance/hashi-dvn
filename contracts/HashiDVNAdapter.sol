@@ -202,7 +202,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
 
         /// 2nd verification from LZ payload passed
         if (payloadHash == reportedHash) {
-            _decodeAndVerify(_srcEid, message);
+            _decodeAndVerify(message);
             emit MessageVerified(nonce, reportedHash);
         } else {
             revert HashiMismatch();
@@ -226,6 +226,15 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
         pure
         returns (uint64 nonce, uint32 srcEid, uint32 dstEid, bytes32 receiver)
     {
+        assembly {
+            nonce := mload(add(packetHeader, 9)) // 8 + 64
+            srcEid := mload(add(packetHeader, 13)) // 8 + 64 + 32
+            dstEid := mload(add(packetHeader, 49)) // 8 + 64 + 32 +256 + 32
+            receiver := mload(add(packetHeader, 81)) // 8 + 64 + 32 +256 + 32 + 256
+        }
+    }
+
+    function decodePacketHeader(bytes memory packetHeader) external pure returns (uint64 nonce, uint32 srcEid, uint32 dstEid, bytes32 receiver){
         assembly {
             nonce := mload(add(packetHeader, 9)) // 8 + 64
             srcEid := mload(add(packetHeader, 13)) // 8 + 64 + 32

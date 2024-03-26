@@ -1,11 +1,11 @@
 const hre = require("hardhat");
 const { chainConfig } = require("../config");
 
-async function initializeDestination() {
+async function initializeSource() {
   const [owner] = await ethers.getSigners();
-  const sourceChainAddress = chainConfig.chainAddress.gnosis;
-  const destChainAddress = chainConfig.chainAddress.ethereum;
-  const sourceEid = sourceChainAddress.endpointId; // in setDestAdapters, source is the ethereum, destintaion is gnosis
+  const sourceChainAddress = chainConfig.chainAddress.ethereum;
+  const destChainAddress = chainConfig.chainAddress.gnosis;
+  const sourceEid = sourceChainAddress.endpointId;
   const dstEid = destChainAddress.endpointId;
 
   const hashiDVN = await hre.ethers.getContractAt(
@@ -70,7 +70,7 @@ async function initializeDestination() {
   console.log("set Peer for Oapp ", setPeer.hash);
 }
 
-initializeDestination().catch((error) => {
+initializeSource().catch((error) => {
   console.error(error);
   process.exitCode = 1;
 });
@@ -82,4 +82,4 @@ function zeroPadHex(value, length) {
   return paddedHex;
 }
 
-exports.initializeDestination = initializeDestination;
+exports.initializeSource = initializeSource;
