@@ -8,6 +8,9 @@ const {
   getDVNMessage,
 } = require("../utils/encoding");
 
+// Handle the event listeners and call contracts on destination chain
+// call HashiMessageRelayAdapter.storeHash
+// call HashiDVNAdapter.verifyMessageHash
 class HashiDVNSender {
   constructor(
     viemClient,
@@ -28,6 +31,7 @@ class HashiDVNSender {
     this.dvnPacketsArray = []; // [{packet, packetHeader, payloadHash }]
   }
 
+  // callback function called by event listener
   async handleEventUpdate() {
     this.hashiIdsAndHashArray =
       this.messageRelayedEventListener.messageRelayedIdsAndHash;
@@ -38,6 +42,9 @@ class HashiDVNSender {
       this.storeHashAndVerify();
   }
 
+  // Two operations:
+  // a. store hash on message relay adapter
+  // b. call verifyMessageHash on Hashi DVN Adapter
   async storeHashAndVerify() {
     const sourceAddresses = this.viemClient.getAddress(this.sourceChain);
     const destAddresses = this.viemClient.getAddress(this.destChain);
@@ -60,12 +67,14 @@ class HashiDVNSender {
       const txStoreHash = await destChainClient.writeContract(writestoreHash);
       console.log(`call storeHash on MessageRelay Adapter: ${txStoreHash} on ${this.destChain}`);
 
+      // reconstruct the DVNAdapter message needed to verify 
       const encodedMessage = getDVNMessage(
         zeroPadHex(destAddresses.receive302, 64),
         this.dvnPacketsArray[i]["payloadHash"],
         this.dvnPacketsArray[i]["packetHeader"],
       );
 
+      // verify message hash of the id, message pair
       const { result, request: writeVerifyMessageHash } =
         await destChainClient.simulateContract({
           address: destAddresses.hashiDVNAdapter,
@@ -81,6 +90,7 @@ class HashiDVNSender {
         `call verifyMessageHash on HashiDVNAdapter ${txVerifyMessageHash}  on ${this.destChain}`,
       );
 
+      // remove the id and packet pair
       this.dvnPacketsArray.splice(i, 1);
       this.hashiIdsAndHashArray.splice(i, 1);
     }

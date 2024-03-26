@@ -18,13 +18,13 @@ const MESSAGE_OFFSET = 113;
 exports.trim0x = function (str) {
   return str.replace(/^0x/, "");
 };
-// receive lib, payloadHash, packetHeader
+
 exports.getDVNMessage = function getDVNMessage(
   receiveLib,
   payloadHash,
   packetHeader,
 ) {
-  //receiceLib, packetHeader, payloadHash
+  //receiceLib, payloadHash, packetHeader
   const RECEIVELIB_OFFSET = 0; // 32 bytes
   const PAYLOADHASH_OFFSET = 32; // 32 bytes
   const PACKETHEADER_OFFSET = 64; // 81 bytes

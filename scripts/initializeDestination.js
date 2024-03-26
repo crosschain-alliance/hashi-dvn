@@ -25,10 +25,13 @@ async function initializeDestination() {
     sourceChainAddress.endpointId,
     sourceChainAddress.chainId,
   );
+  console.log("Set source eid to chain ID ",sourceEidToChainID);
+
   const destEidToChainID = await hashiDVN.setEidToChainID(
     destChainAddress.endpointId,
     destChainAddress.chainId,
   );
+  console.log("Set destination eid to chain ID ",destEidToChainID);
 
   const setWorkerFeelib = await hashiDVN.setWorkerFeeLib(
     sourceChainAddress.hashiDVNFeeLib,

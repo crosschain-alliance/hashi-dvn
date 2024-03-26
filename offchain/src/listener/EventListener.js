@@ -6,6 +6,10 @@ const { abi: EndpointV2ABI } = require("../../abi/EndpointV2.json");
 const { abi: YahoABI } = require("../../abi/Yaho.json");
 const { PacketSerializer } = require("../utils/encoding");
 
+
+
+// Listen to MessageRelayed event from the Yaho contract
+// store id and messageHash of the message
 class MessageRelayedEventListener {
   constructor(viemClient, sourceChain, destChain) {
     this.viemClient = viemClient;
@@ -63,6 +67,9 @@ class MessageRelayedEventListener {
   }
 }
 
+
+// Listen to PacketSent and DVNFeePaid event from an Oapp
+// store the packet from the event
 class DVNEventListener {
   constructor(viemClient, sourceChain, destChain) {
     this.viemClient = viemClient;
@@ -92,8 +99,8 @@ class DVNEventListener {
   }
 
   async processLogs(log) {
-    // get all the logs from this transaction
 
+    // get all the logs from this transaction
     const transaction = await this.sourceChainClient.getTransactionReceipt({
       hash: log[0].transactionHash,
     });
@@ -114,6 +121,8 @@ class DVNEventListener {
           ]),
           logs: transaction.logs,
         });
+      
+        // check whether Hashi DVN is in required or optional DVN list
         for (let i = 0; i < parsedEvent[0].args.requiredDVNs.length; i++) {
           if (
             parsedEvent[0].args.requiredDVNs[i] ==
@@ -129,13 +138,14 @@ class DVNEventListener {
             parsedEvent[0].args.requiredDVNs[i] ==
             this.sourceAddresses.hashiDVNAdapter
           ) {
-            console.log("Hashi DVN Adapter fee");
+            console.log("Hashi DVN Adapter fee paid");
             isHashiDVNAssigned = true;
             break;
           }
         }
       }
 
+      // if HashiDVN is assigned, store the packet 
       if (transaction.logs[i].topics[0] == PACKET_SENT && isHashiDVNAssigned) {
         console.log("Hashi DVN Adapter is assigned");
         const parsed = parseEventLogs({
