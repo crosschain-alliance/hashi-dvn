@@ -23,6 +23,6 @@ const main = async () => {
   const message = "0x5c36b186" // sample function call 
   const tx = await oApp.send(dstEid, message, _options, { value: 200000 });
   const receipt = await tx.wait();
-  console.log(`Message sent ${receipt} on ${hre.network.name}`);
+  console.log(`Message sent ${receipt.hash} on ${hre.network.name}`);
 };
 main();

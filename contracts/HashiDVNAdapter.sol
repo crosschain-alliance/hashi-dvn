@@ -158,7 +158,7 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
     function verifyMessageHash(
         bytes32 messageId,
         bytes calldata message
-    ) external onlyRole(ADMIN_ROLE) returns (uint256) {
+    ) external onlyRole(ADMIN_ROLE) returns (bool) {
         (
             address receiveLib,
             bytes memory packetHeader,
@@ -200,13 +200,11 @@ contract HashiDVNAdapter is DVNAdapterBase, IHashiDVNAdapter {
             emit LogError(error);
         }
 
-        /// 2nd verification from LZ payload passed
-        if (payloadHash == reportedHash) {
-            _decodeAndVerify(message);
-            emit MessageVerified(nonce, reportedHash);
-        } else {
-            revert HashiMismatch();
-        }
+        _decodeAndVerify(message);
+        emit MessageVerified(nonce, reportedHash);
+        return true;
+
+      
     }
 
     /// @notice decode data from packetHeader

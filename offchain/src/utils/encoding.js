@@ -224,7 +224,16 @@ function zeroPadHex(value, length) {
   return paddedHex;
 }
 
+function BigIntToString(key, value) {
+  if (typeof value === "bigint") {
+    return value.toString();
+  } else {
+    return value;
+  }
+}
+
 exports.PacketSerializer = PacketSerializer;
 exports.packetToMessageOrigin = packetToMessageOrigin;
 exports.calculateGuid = calculateGuid;
 exports.zeroPadHex = zeroPadHex;
+exports.BigIntToString = BigIntToString;

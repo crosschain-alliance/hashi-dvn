@@ -1,0 +1,279 @@
+{
+    "abi": [
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "sourceEid",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "destAdapters",
+              "type": "address"
+            }
+          ],
+          "name": "NewDestAdaptersPairSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint256",
+              "name": "fee",
+              "type": "uint256"
+            }
+          ],
+          "name": "NewFeeSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "sourceEid",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sourceAdapters",
+              "type": "address"
+            },
+            {
+              "indexed": false,
+              "internalType": "address",
+              "name": "destAdapters",
+              "type": "address"
+            }
+          ],
+          "name": "NewSourceAdaptersPairSet",
+          "type": "event"
+        },
+        {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "previousOwner",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "OwnershipTransferred",
+          "type": "event"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "sourceEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            }
+          ],
+          "name": "getDestAdapters",
+          "outputs": [
+            {
+              "internalType": "address[]",
+              "name": "",
+              "type": "address[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            }
+          ],
+          "name": "getDestFee",
+          "outputs": [
+            {
+              "internalType": "uint256",
+              "name": "fee",
+              "type": "uint256"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "sourceEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            }
+          ],
+          "name": "getSourceAdaptersPair",
+          "outputs": [
+            {
+              "components": [
+                {
+                  "internalType": "address",
+                  "name": "sourceAdapter",
+                  "type": "address"
+                },
+                {
+                  "internalType": "address",
+                  "name": "destAdapter",
+                  "type": "address"
+                }
+              ],
+              "internalType": "struct HashiRegistry.AdapterPair[]",
+              "name": "",
+              "type": "tuple[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "owner",
+          "outputs": [
+            {
+              "internalType": "address",
+              "name": "",
+              "type": "address"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [],
+          "name": "renounceOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "sourceEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "address[]",
+              "name": "_destAdapters",
+              "type": "address[]"
+            }
+          ],
+          "name": "setDestAdapters",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint256",
+              "name": "fee",
+              "type": "uint256"
+            }
+          ],
+          "name": "setDestFee",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint32",
+              "name": "sourceEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "uint32",
+              "name": "destEid",
+              "type": "uint32"
+            },
+            {
+              "internalType": "address[]",
+              "name": "_sourceAdapters",
+              "type": "address[]"
+            },
+            {
+              "internalType": "address[]",
+              "name": "_destAdapters",
+              "type": "address[]"
+            }
+          ],
+          "name": "setSourceAdaptersPair",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "newOwner",
+              "type": "address"
+            }
+          ],
+          "name": "transferOwnership",
+          "outputs": [],
+          "stateMutability": "nonpayable",
+          "type": "function"
+        }
+      ]
+}
