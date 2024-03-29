@@ -1,5 +1,5 @@
-const { DVNEventListener } = require("./listener/eventListener");
-const { HashiDVNSender } = require("./sender/hashiDVNSender");
+const { DVNEventListener } = require("./listener/EventListener");
+const { HashiDVNSender } = require("./sender/HashiDVNSender");
 const { ViemClient } = require("./client/viemClient");
 
 async function main() {
@@ -11,7 +11,6 @@ async function main() {
   const dvnEventListener = new DVNEventListener(
     viemClient,
     sourceChain,
-    destChain,
   );
   await dvnEventListener.start();
   const hashiDVNSender = new HashiDVNSender(

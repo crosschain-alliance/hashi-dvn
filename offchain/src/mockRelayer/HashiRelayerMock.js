@@ -12,14 +12,13 @@ const { zeroPadHex } = require("../utils/encoding");
 // Store id and messageHash of the message
 class HashiRelayerMock {
   constructor(viemClient, sourceChain, destChain) {
-    this.viemClient = viemClient;
     this.unwatch = null;
     this.sourceChain = sourceChain;
     this.destChain = destChain;
-    this.sourceAddresses = this.viemClient.getAddress(this.sourceChain);
-    this.destAddresses = this.viemClient.getAddress(this.destChain);
-    this.sourceChainClient = this.viemClient.getClient(this.sourceChain);
-    this.destChainClient = this.viemClient.getClient(this.destChain);
+    this.sourceAddresses = viemClient.getAddress(this.sourceChain);
+    this.destAddresses = viemClient.getAddress(this.destChain);
+    this.sourceChainClient = viemClient.getClient(this.sourceChain);
+    this.destChainClient = viemClient.getClient(this.destChain);
   }
 
   async start() {

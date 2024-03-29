@@ -7,15 +7,11 @@ const { PacketSerializer } = require("../utils/encoding");
 // Listen to PacketSent and DVNFeePaid event from an Oapp
 // store the packet from the event
 class DVNEventListener {
-  constructor(viemClient, sourceChain, destChain) {
-    this.viemClient = viemClient;
+  constructor(viemClient, sourceChain) {
     this.unwatch = null;
     this.sourceChain = sourceChain;
-    this.destChain = destChain;
-    this.sourceAddresses = this.viemClient.getAddress(this.sourceChain);
-    this.destAddresses = this.viemClient.getAddress(this.destChain);
-    this.sourceChainClient = this.viemClient.getClient(this.sourceChain);
-    this.destChainClient = this.viemClient.getClient(this.destChain);
+    this.sourceAddresses = viemClient.getAddress(this.sourceChain);
+    this.sourceChainClient = viemClient.getClient(this.sourceChain);
     this.packets = [];
     // packets = [{
     //   messageId : bytes32,//bigInt
@@ -29,6 +25,7 @@ class DVNEventListener {
   async start() {
     console.log(`Listening Packet Sent event on ${this.sourceChain}...`);
 
+    console.log("address ",this.sourceAddresses.endpoint)
     this.unwatch = this.sourceChainClient.watchContractEvent({
       address: this.sourceAddresses.endpoint,
       abi: EndpointV2ABI,
