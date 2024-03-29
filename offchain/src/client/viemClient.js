@@ -1,4 +1,4 @@
-const { gnosis, optimism, mainnet } = require("viem/chains");
+const { gnosis, optimism, mainnet, sepolia, gnosisChiado } = require("viem/chains");
 
 const { createWalletClient, http, publicActions } = require("viem");
 const { privateKeyToAccount } = require("viem/accounts");
@@ -21,6 +21,10 @@ class ViemClient {
       case "localhostgno":
         // for fork testing
         return chainConfig.chainAddress.gnosis;
+      case "sepolia":
+        return chainConfig.chainAddress.sepolia;
+      case "chiado":
+        return chainConfig.chainAddress.chiado;
     }
   }
 
@@ -52,6 +56,18 @@ class ViemClient {
           chain: gnosis,
           transport: http("http://127.0.0.1:8550"),
         }).extend(publicActions);
+      case "sepolia":
+        return createWalletClient({
+          account: this.account,
+          chain: sepolia,
+          transport: http(),
+        }).extend(publicActions);
+      case "chiado":
+          return createWalletClient({
+            account: this.account,
+            chain: gnosisChiado,
+            transport: http(),
+          }).extend(publicActions)
     }
   }
 }
