@@ -1,6 +1,6 @@
 const { DVNEventListener } = require("./listener/EventListener");
 const { HashiDVNSender } = require("./sender/HashiDVNSender");
-const { ViemClient } = require("./client/viemClient");
+const { ViemClient } = require("./client/ViemClient");
 
 async function main() {
   const sourceChain = process.env.SOURCE_CHAIN;

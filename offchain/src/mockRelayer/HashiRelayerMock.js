@@ -1,6 +1,6 @@
 require("dotenv").config();
 
-const { ViemClient } = require("../client/viemClient");
+const { ViemClient } = require("../client/ViemClient");
 const { abi: MessageRelayABI } = require("../../abi/MockMessageRelay.json");
 const {
   abi: MessageRelayAdapterABI,
