@@ -6,8 +6,9 @@ const { zeroPadHex, getDVNMessage } = require("../utils/encoding");
 // call HashiDVNAdapter.verifyMessageHash
 class HashiDVNSender {
   constructor(viemClient, destChain, DVNEventListener) {
-    this.viemClient = viemClient;
     this.destChain = destChain;
+    this.destAddresses = viemClient.getAddress(this.destChain);
+    this.destChainClient = viemClient._clients[this.destChain];
     this.dvnEventListener = DVNEventListener;
     this.dvnEventListener.handleCallback = this.handleEventUpdate.bind(this);
     this.dvnPacketsArray = []; // [{packet, packetHeader, payloadHash }]
@@ -16,6 +17,7 @@ class HashiDVNSender {
   // callback function called by event listener
   async handleEventUpdate() {
     this.dvnPacketsArray = this.dvnEventListener.packets;
+    console.log("packet ", this.dvnPacketsArray)
     await this.VerifyMessageHash();
   }
 
@@ -25,13 +27,12 @@ class HashiDVNSender {
   async VerifyMessageHash() {
     const PAYLOAD_VERIFIED =
       "0x2cb0eed7538baeae4c6fde038c0fd0384d27de0dd55a228c65847bda6aa1ab56";
-    const destAddresses = this.viemClient.getAddress(this.destChain);
-    const destChainClient = this.viemClient.getClient(this.destChain);
+
 
     for (let i = 0; i < this.dvnPacketsArray.length; i++) {
       // reconstruct the DVNAdapter message needed to verify
       const encodedMessage = getDVNMessage(
-        zeroPadHex(destAddresses.receive302, 64),
+        zeroPadHex(this.destAddresses.receive302, 64),
         this.dvnPacketsArray[i]["payloadHash"],
         this.dvnPacketsArray[i]["packetHeader"],
       );
@@ -42,13 +43,13 @@ class HashiDVNSender {
       while (retry && retryCount <= 5) {
         try {
           const { request: writeVerifyMessageHash } =
-            await destChainClient.simulateContract({
-              address: destAddresses.hashiDVNAdapter,
+            await this.destChainClient.simulateContract({
+              address: this.destAddresses.hashiDVNAdapter,
               abi: HashiDVNAdapterABI,
               functionName: "verifyMessageHash",
               args: [messageId, encodedMessage],
             });
-          const txVerifyMessageHash = await destChainClient.writeContract(
+          const txVerifyMessageHash = await this.destChainClient.writeContract(
             writeVerifyMessageHash,
           );
 
@@ -59,7 +60,7 @@ class HashiDVNSender {
           // Check if the transaction has emit event PayloadVerified from receiveLib302
 
           const verifyMessageHashReceipt =
-            await destChainClient.getTransactionReceipt({
+            await this.destChainClient.getTransactionReceipt({
               hash: txVerifyMessageHash,
             });
 
@@ -74,7 +75,7 @@ class HashiDVNSender {
                 logs: verifyMessageHashReceipt.logs,
               });
 
-              if (parsedEvent[0].args.dvn == destAddresses.hashiDVNAdapter)
+              if (parsedEvent[0].args.dvn == this.destAddresses.hashiDVNAdapter)
                 console.log(
                   `Hashi DVN has verified the message of ID ${messageId}`,
                 );
@@ -89,8 +90,8 @@ class HashiDVNSender {
             this.dvnPacketsArray.splice(i, 1);
           }
           console.log(error);
-          console.log("Retrying in 5 seconds...");
-          await new Promise((resolve) => setTimeout(resolve, 5000));
+          console.log("Retrying in 10 seconds...");
+          await new Promise((resolve) => setTimeout(resolve, 10000));
         }
       }
 
@@ -100,4 +101,4 @@ class HashiDVNSender {
   }
 }
 
-exports.HashiDVNSender = HashiDVNSender;
+module.exports = {HashiDVNSender};

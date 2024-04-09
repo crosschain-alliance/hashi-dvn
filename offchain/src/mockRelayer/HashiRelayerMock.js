@@ -1,6 +1,6 @@
 require("dotenv").config();
-
-const { ViemClient } = require("../client/ViemClient");
+const {mainnet, gnosis, sepolia, polygonMumbai} = require("viem/chains");
+const { Multiclient } = require("../client/ViemClient");
 const { abi: MessageRelayABI } = require("../../abi/MockMessageRelay.json");
 const {
   abi: MessageRelayAdapterABI,
@@ -17,18 +17,20 @@ class HashiRelayerMock {
     this.destChain = destChain;
     this.sourceAddresses = viemClient.getAddress(this.sourceChain);
     this.destAddresses = viemClient.getAddress(this.destChain);
-    this.sourceChainClient = viemClient.getClient(this.sourceChain);
-    this.destChainClient = viemClient.getClient(this.destChain);
+    this.sourceChainClient = viemClient._clients[this.sourceChain];
+
+    this.destChainClient = viemClient._clients[this.destChain];
+    console.log("Dest client ", this.destChainClient)
   }
 
   async start() {
-    console.log(`Listening Hashi Message Relay on ${this.sourceChain}...`);
-
+    console.log(`Listening Hashi Message Relay  ${ this.sourceAddresses.messageRelay} on ${this.sourceChain}...`);
     this.unwatch = this.sourceChainClient.watchContractEvent({
-      address: this.sourceAddresses.mockMessageRelay,
+      address: this.sourceAddresses.messageRelay,
       abi: MessageRelayABI,
       event: "MessageRelayed",
       onLogs: async (logs) => {
+        console.log("new message relayed")
         try {
           await this.processLogs(logs);
         } catch (error) {
@@ -42,7 +44,7 @@ class HashiRelayerMock {
 
   async processLogs(log) {
     const messageId = zeroPadHex(log[0].topics[2].toString(), 64);
-    const chainId = zeroPadHex(this.sourceAddresses.chainId.toString(), 64);
+    const chainId = this.sourceAddresses.chainId;
     let messageHash;
     try {
       messageHash = await this.sourceChainClient.readContract({
@@ -83,10 +85,25 @@ async function main() {
   const sourceChain = process.env.SOURCE_CHAIN;
   const destChain = process.env.DESTINATION_CHAIN;
 
-  const viemClient = new ViemClient(`0x${process.env.PRIV_KEY}`);
+  const chains = [
+    { name: "ethereum", type: mainnet},
+    { name: "gnosis" , type: gnosis},
+    { name: "sepolia" , type: sepolia},
+    { name: "polygonMumbai", type: polygonMumbai }
+  ];
+  const rpcUrls = {
+
+    "ethereum": `${process.env.ETH_RPC_URL}`,
+    "gnosis": `${process.env.GNO_RPC_URL}`,
+    "sepolia": `${process.env.SEPOLIA_RPC_URL}`,
+    "polygonMumbai": `${process.env.MUMBAI_RPC_URL}`
+  }
+
+  const multiclient = new Multiclient({chains,privateKey: `0x${process.env.PRIVATE_KEY}` ,rpcUrls})
+
 
   const messageRelayedEventListener = new HashiRelayerMock(
-    viemClient,
+    multiclient,
     sourceChain,
     destChain,
   );

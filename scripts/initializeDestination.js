@@ -3,8 +3,8 @@ const { chainConfig } = require("../config");
 
 async function initializeDestination() {
   const [owner] = await ethers.getSigners();
-  const sourceChainAddress = chainConfig.chainAddress.gnosis;
-  const destChainAddress = chainConfig.chainAddress.ethereum;
+  const sourceChainAddress = chainConfig.chainAddress.mumbai;
+  const destChainAddress = chainConfig.chainAddress.sepolia;
   const sourceEid = sourceChainAddress.endpointId; // in setDestAdapters, source is the ethereum, destintaion is gnosis
   const dstEid = destChainAddress.endpointId;
 
@@ -66,11 +66,15 @@ async function initializeDestination() {
     sourceChainAddress.oapp,
     owner,
   );
-  const setPeer = await oApp.setPeer(
+  const setPeer = await oApp.setOappPeer(
     dstEid,
     zeroPadHex(destChainAddress.oapp, 64),
+    sourceChainAddress.send302,
+    sourceChainAddress.receive302,
+    sourceChainAddress.executor
   );
   console.log("set Peer for Oapp ", setPeer.hash);
+
 }
 
 initializeDestination().catch((error) => {

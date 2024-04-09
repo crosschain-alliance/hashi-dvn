@@ -5,17 +5,16 @@ const { readFileSync, writeFileSync } = require("fs");
 async function deployToDestination() {
   const [owner] = await ethers.getSigners();
 
-  const msgFee = Array(1).fill(200000);
+  const msgFee = Array(1).fill(200000); // fee for Executor 
 
-  const LZEndpoint = "0x1a44076050125825900e736c501f859c50fe728c"; // endpoint on every mainnet
+  const LZEndpoint = "0x6edce65403992e310a62460808c4b910d972f10f"; // endpoint on every testnet
 
-  const sourceChainAddress = chainConfig.chainAddress.gnosis;
-  const destChainAddress = chainConfig.chainAddress.ethereum;
+  const sourceChainAddress = chainConfig.chainAddress.mumbai;
+  const destChainAddress = chainConfig.chainAddress.sepolia;
   const sourceEid = sourceChainAddress.endpointId;
   const destEid = destChainAddress.endpointId;
-  const override = true;
 
-  if (override) {
+
     const yaho = await hre.ethers.deployContract("Yaho", [], owner);
     await yaho.waitForDeployment();
     console.log(`Yaho deployed to ${await yaho.getAddress()}`);
@@ -99,7 +98,7 @@ async function deployToDestination() {
 
     const oApp = await hre.ethers.deployContract(
       "MockOapp",
-      [LZEndpoint, await executor.getAddress(), await hashiDVN.getAddress()],
+      [LZEndpoint, await hashiDVN.getAddress(),sourceEid],
       owner,
     );
     await oApp.waitForDeployment();
@@ -120,7 +119,7 @@ async function deployToDestination() {
     };
     for (let key in updatedAddresses) {
       if (updatedAddresses.hasOwnProperty(key)) {
-        chainConfig.chainAddress.gnosis[key] = updatedAddresses[key];
+        chainConfig.chainAddress.mumbai[key] = updatedAddresses[key];
       }
     }
 
@@ -128,7 +127,7 @@ async function deployToDestination() {
       "./config.js",
       `module.exports = { chainConfig: ${JSON.stringify(chainConfig, null, 4).replace(/\"([^(\")"]+)\":/g, "$1:")}\n}`,
     );
-  }
+  
 
   if (!hre.network.name.includes("localhost")) {
     await hre.run("verify:verify", {
@@ -168,20 +167,22 @@ async function deployToDestination() {
     console.log("Hashi DVN verified");
     await hre.run("verify:verify", {
       address: await executor.getAddress(),
-      constructorArguments: [gnosisEndpoint, [gnosisEid], msgFee],
+      constructorArguments: [LZEndpoint, [destEid], msgFee],
     });
     console.log("executor verified");
 
     await hre.run("verify:verify", {
       address: await oApp.getAddress(),
       constructorArguments: [
-        gnosisEndpoint,
-        await executor.getAddress(),
+        LZEndpoint,
         await hashiDVN.getAddress(),
+        sourceEid
       ],
     });
     console.log("oApp gnosis verified");
   }
+
+    
 }
 
 deployToDestination().catch((error) => {

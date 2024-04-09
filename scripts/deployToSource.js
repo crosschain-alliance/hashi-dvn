@@ -4,16 +4,16 @@ const { readFileSync, writeFileSync } = require("fs");
 
 async function deployToSource() {
   const [owner] = await ethers.getSigners();
-  const LZEndpoint = "0x1a44076050125825900e736c501f859c50fe728c"; // endpoint on every mainnet
+  const LZEndpoint = "0x6edce65403992e310a62460808c4b910d972f10f"; // endpoint on every mainnet
 
   const msgFee = Array(1).fill(200000);
-  const sourceChainAdress = chainConfig.chainAddress.ethereum;
-  const destChainAddress = chainConfig.chainAddress.gnosis;
+  const sourceChainAdress = chainConfig.chainAddress.sepolia;
+  const destChainAddress = chainConfig.chainAddress.mumbai;
   const sourceEid = sourceChainAdress.endpointId;
   const dstEid = destChainAddress.endpointId;
-  const override = true;
 
-  if (override) {
+
+
     const yaho = await hre.ethers.deployContract("Yaho", [], owner);
     await yaho.waitForDeployment();
     console.log(`Yaho deployed to ${await yaho.getAddress()}`);
@@ -97,7 +97,7 @@ async function deployToSource() {
 
     const oApp = await hre.ethers.deployContract(
       "MockOapp",
-      [LZEndpoint, await executor.getAddress(), await hashiDVN.getAddress()],
+      [LZEndpoint, await hashiDVN.getAddress(),sourceEid],
       owner,
     );
     await oApp.waitForDeployment();
@@ -118,7 +118,7 @@ async function deployToSource() {
     };
     for (let key in updatedAddresses) {
       if (updatedAddresses.hasOwnProperty(key)) {
-        chainConfig.chainAddress.ethereum[key] = updatedAddresses[key];
+        chainConfig.chainAddress.sepolia[key] = updatedAddresses[key];
       }
     }
 
@@ -126,7 +126,7 @@ async function deployToSource() {
       "./config.js",
       `module.exports = { chainConfig: ${JSON.stringify(chainConfig, null, 4).replace(/\"([^(\")"]+)\":/g, "$1:")}\n }`,
     );
-  }
+  
 
   if (!hre.network.name.includes("localhost")) {
     await hre.run("verify:verify", {
@@ -160,19 +160,18 @@ async function deployToSource() {
     console.log("Hashi DVN verified");
     await hre.run("verify:verify", {
       address: await executor.getAddress(),
-      constructorArguments: [LZEndpoint, [sourceEid], msgFee],
+      constructorArguments: [LZEndpoint, [dstEid], msgFee],
     });
     console.log("executor verified");
 
     await hre.run("verify:verify", {
       address: await oAppSource.getAddress(),
       constructorArguments: [
-        LZEndpoint,
-        await executor.getAddress(),
-        await hashiDVN.getAddress(),
+        LZEndpoint, await hashiDVN.getAddress(),sourceEid
       ],
     });
     console.log("oApp source chain verified");
+   
   }
 }
 

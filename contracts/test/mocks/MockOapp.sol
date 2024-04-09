@@ -18,26 +18,19 @@ contract MockOapp is OApp {
     MessageDetails[] public messages;
 
     address public immutable dvn; // this would never be immutable in a real app
-    address public immutable executor; // this would never be immutable in a real app
-
+ //   address public immutable executor; // this would never be immutable in a real app
+    uint32 srcEid;
     constructor(
         address endpoint,
-        address _executor,
-        address _dvn
+        address _dvn,
+        uint32 _srcEid
     ) OApp(endpoint, msg.sender) {
-        executor = _executor;
         dvn = _dvn;
+        srcEid = _srcEid;
+
     }
-
-    function setPeer(uint32 _eid, bytes32 _peer) public override onlyOwner {
-        // @note onlyOwner redundant here but kept for explicitness
-        // dvn + executor config would never be fixed like this in a real app.
-        (address receiveLib, ) = endpoint.getReceiveLibrary(
-            address(this),
-            _eid
-        );
-        address sendLib = endpoint.getSendLibrary(address(this), _eid);
-
+   function setOappPeer(uint32 _dstEid, bytes32 _peer, address sendLib, address receiveLib, address executor) public onlyOwner {
+    
         address[] memory requiredDVNs = new address[](1);
         requiredDVNs[0] = dvn;
 
@@ -52,17 +45,17 @@ contract MockOapp is OApp {
 
         ExecutorConfig memory executorConfig = ExecutorConfig({
             maxMessageSize: 1024, // Not important for this example
-            executor: executor
+            executor: executor // executor address on this chain
         });
 
         SetConfigParam[] memory sendConfigs = new SetConfigParam[](2);
         sendConfigs[0] = SetConfigParam({
-            eid: _eid,
+            eid: _dstEid,
             configType: 2, // CONFIG_TYPE_ULN
             config: abi.encode(ulnConfig)
         });
         sendConfigs[1] = SetConfigParam({
-            eid: _eid,
+            eid: _dstEid,
             configType: 1, // CONFIG_TYPE_EXECUTOR
             config: abi.encode(executorConfig)
         });
@@ -70,11 +63,13 @@ contract MockOapp is OApp {
         SetConfigParam[] memory receiveConfigs = new SetConfigParam[](1);
         receiveConfigs[0] = sendConfigs[0];
 
-        endpoint.setConfig(address(this), receiveLib, receiveConfigs);
+        // endpoint.setConfig(address(this), receiveLib, receiveConfigs);
         endpoint.setConfig(address(this), sendLib, sendConfigs);
 
-        super.setPeer(_eid, _peer);
+        peers[_dstEid] = _peer;
+        emit PeerSet(_dstEid, _peer);
     }
+
 
     function send(
         uint32 _dstEid,

@@ -3,8 +3,8 @@ const { chainConfig } = require("../config");
 
 async function initializeSource() {
   const [owner] = await ethers.getSigners();
-  const sourceChainAddress = chainConfig.chainAddress.ethereum;
-  const destChainAddress = chainConfig.chainAddress.gnosis;
+  const sourceChainAddress = chainConfig.chainAddress.sepolia;
+  const destChainAddress = chainConfig.chainAddress.mumbai;
   const sourceEid = sourceChainAddress.endpointId;
   const dstEid = destChainAddress.endpointId;
 
@@ -13,6 +13,11 @@ async function initializeSource() {
     sourceChainAddress.hashiDVNAdapter,
     owner,
   );
+  console.log( [
+    sourceChainAddress.send302,
+    dstEid,
+    zeroPadHex(destChainAddress.receive302, 64),
+  ],)
   const setReceiveLibs = await hashiDVN.setReceiveLibs([
     [
       sourceChainAddress.send302,
@@ -20,6 +25,7 @@ async function initializeSource() {
       zeroPadHex(destChainAddress.receive302, 64),
     ],
   ]);
+
   console.log("Set ReceiveLib for HashiDVNAdapter ", setReceiveLibs.hash);
   const sourceEidToChainID = await hashiDVN.setEidToChainID(
     sourceChainAddress.endpointId,
@@ -66,9 +72,13 @@ async function initializeSource() {
     sourceChainAddress.oapp,
     owner,
   );
-  const setPeer = await oApp.setPeer(
+
+  const setPeer = await oApp.setOappPeer(
     dstEid,
     zeroPadHex(destChainAddress.oapp, 64),
+    sourceChainAddress.send302,
+    sourceChainAddress.receive302,
+    sourceChainAddress.executor // need to be the source chain executor because it will be used in payExecutor
   );
   console.log("set Peer for Oapp ", setPeer.hash);
 }

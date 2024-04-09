@@ -19,7 +19,7 @@ exports.trim0x = function (str) {
   return str.replace(/^0x/, "");
 };
 
-exports.getDVNMessage = function getDVNMessage(
+function getDVNMessage(
   receiveLib,
   payloadHash,
   packetHeader,
@@ -232,8 +232,4 @@ function BigIntToString(key, value) {
   }
 }
 
-exports.PacketSerializer = PacketSerializer;
-exports.packetToMessageOrigin = packetToMessageOrigin;
-exports.calculateGuid = calculateGuid;
-exports.zeroPadHex = zeroPadHex;
-exports.BigIntToString = BigIntToString;
+module.exports = {getDVNMessage, PacketSerializer, packetToMessageOrigin, calculateGuid, zeroPadHex, BigIntToString}
