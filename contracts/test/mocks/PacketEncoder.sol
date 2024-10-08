@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.20;
 
-import {Packet} from "../../layerzero-v2/protocol/interfaces/ISendLib.sol";
-import {DVNAdapterMessageCodec} from "../../layerzero-v2/messagelib/uln/dvn/adapters/libs/DVNAdapterMessageCodec.sol";
+import {Packet} from "@layerzerolabs/lz-evm-protocol-v2/contracts/interfaces/ISendLib.sol";
+import {DVNAdapterMessageCodec} from "@layerzerolabs/lz-evm-messagelib-v2/contracts/uln/dvn/adapters/libs/DVNAdapterMessageCodec.sol";
 //struct Packet {
 //     uint64 nonce;
 //     uint32 srcEid;

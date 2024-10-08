@@ -1,0 +1,139 @@
+{
+    "abi": [
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "emitter",
+              "type": "address"
+            }
+          ],
+          "name": "NoOracleAdaptersGiven",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "emitter",
+              "type": "address"
+            },
+            {
+              "internalType": "contract IOracleAdapter",
+              "name": "oracleAdapter",
+              "type": "address"
+            }
+          ],
+          "name": "OracleDidNotReport",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "address",
+              "name": "emitter",
+              "type": "address"
+            },
+            {
+              "internalType": "contract IOracleAdapter",
+              "name": "oracleOne",
+              "type": "address"
+            },
+            {
+              "internalType": "contract IOracleAdapter",
+              "name": "oracleTwo",
+              "type": "address"
+            }
+          ],
+          "name": "OraclesDisagree",
+          "type": "error"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "uint256",
+              "name": "domain",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            },
+            {
+              "internalType": "contract IOracleAdapter[]",
+              "name": "oracleAdapters",
+              "type": "address[]"
+            }
+          ],
+          "name": "getHash",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "hash",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "contract IOracleAdapter",
+              "name": "oracleAdapter",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "domain",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getHashFromOracle",
+          "outputs": [
+            {
+              "internalType": "bytes32",
+              "name": "hash",
+              "type": "bytes32"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        },
+        {
+          "inputs": [
+            {
+              "internalType": "contract IOracleAdapter[]",
+              "name": "oracleAdapters",
+              "type": "address[]"
+            },
+            {
+              "internalType": "uint256",
+              "name": "domain",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "id",
+              "type": "uint256"
+            }
+          ],
+          "name": "getHashesFromOracles",
+          "outputs": [
+            {
+              "internalType": "bytes32[]",
+              "name": "",
+              "type": "bytes32[]"
+            }
+          ],
+          "stateMutability": "view",
+          "type": "function"
+        }
+      ]
+}
